@@ -7,6 +7,7 @@ authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 requests = "^2.27.1"
+beancount = "^2.3.5"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

@@ -11,3 +11,14 @@
 - [ ] Host the Datasette using Lambda with Mangum (this *should* be quite cheap).
 - [ ] Use strong OpenID Connect authentication in front of it.
   - Amazon Cognito may be of use here.
+
+
+# Getting started
+
+- [Install micromamba](https://mamba.readthedocs.io/en/latest/installation.html).
+- Create prefix `portfolio`:
+
+      micromamba create --file environment.yml --yes
+- Install Python dependencies:
+
+      micromamba run --name portfolio poetry install

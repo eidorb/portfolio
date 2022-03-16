@@ -1,0 +1,34 @@
+image: archlinux
+shell: true
+sources:
+  - git@git.sr.ht:~brodie/portfolio
+tasks:
+  - install-dependencies: |
+      # Install micromamba.
+      curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+      ./bin/micromamba shell -s posix hook >> ~/.buildenv
+
+      # Install Poetry.
+      curl -sSL https://install.python-poetry.org | python3 -
+      echo 'export PATH="/home/build/.local/bin:$PATH"' >> ~/.buildenv
+
+      # Source buildenv to access micromamba and Poetry in this session.
+      . ~/.buildenv
+
+      # Create the portfolio Mamba environment defined by environment.yml.
+      cd portfolio
+      micromamba create --file environment.yml --yes
+
+      # Install Python dependencies.
+      micromamba run --name portfolio poetry install
+
+      # Export secrets.
+      cat ~/.secrets >> ~/.buildenv
+  - test: |
+      cd portfolio
+      micromamba run --name portfolio pytest
+secrets:
+  # SSH key.
+  - bc3fa43b-fd2d-4681-8191-603226c49d44
+  # ~/.secrets file.
+  - d928f525-4679-49e3-a0e9-df344460af7a

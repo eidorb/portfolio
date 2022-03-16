@@ -1,6 +1,6 @@
 # Portfolio
 
-- [ ] Create build pipeline that pings Up API.
+- [x] Create build pipeline that pings Up API.
 - [ ] Generate Beancount syntax representing Up account balances.
 - [ ] Create a ledger of portfolio account balances and prices. (Prices are used for currency conversion.)
   - The Beancount ledger format seems as good as any - use it.

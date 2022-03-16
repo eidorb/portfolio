@@ -1,5 +1,8 @@
-from re import sub
+__version__ = "0.1.0"
+
+
 import subprocess
+from re import sub
 
 
 def create_mamba_environment() -> subprocess.CompletedProcess:

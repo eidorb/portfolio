@@ -1,15 +1,21 @@
 __version__ = "0.1.0"
 
+import logging
+import os
 
-import subprocess
-from re import sub
+from beancount.parser import printer
+
+from . import up
+
+logger = logging.getLogger(__name__)
 
 
-def create_mamba_environment() -> subprocess.CompletedProcess:
-    """Creates Mamba environment from environment file."""
-    return subprocess.run("micromamba create --file environment.yml --yes".split())
-
-
-def install_dependencies() -> subprocess.CompletedProcess:
-    """Installs Python dependencies."""
-    return subprocess.run("micromamba run --name portfolio poetry install".split())
+def update_balances(balances_filename="balances.beancount"):
+    """Updates balances ledger with latest account balances."""
+    logging.basicConfig(level=logging.INFO)
+    # Open ledger file in append mode.
+    with open(balances_filename, mode="a") as file:
+        up_balances = up.get_balances(token=os.environ["UP_API_TOKEN"])
+        logger.info("Retrieved Up account balances")
+        printer.print_entries(up_balances, file=file)
+        logger.info("Wrote Up account balances to %s", file.name)

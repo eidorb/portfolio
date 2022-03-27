@@ -5,7 +5,8 @@
 - [x] Generate Beancount balance directives from Up account balances.
 - [x] Create build configuration that commits new ledger entries to repository.
 - [x] Convert Beancount ledger to SQLite database.
-- [ ] Retrieve Bitcoin wallet balance and AUD price.
+- [x] Retrieve Bitcoin wallet balance.
+- [ ] Create Beancount Price directives for commodoties.
 - [ ] Create a Datasette using the exported SQLite file.
 - [ ] Configure some pre-canned SQL queries useful for analysing the portfolio.
 - [ ] Include visualisations (maybe portfolio over time) using the datasette-vega plugin.

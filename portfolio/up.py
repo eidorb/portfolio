@@ -1,9 +1,9 @@
 import typing
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import requests
 from beancount.core.data import Amount, Balance, D
+
+from .common import queensland_now
 
 
 def ping(token: str) -> requests.Response:
@@ -30,7 +30,7 @@ def get_balances(token: str, account_prefix="Assets:Up:") -> list[typing.NamedTu
 
     :return: List of Balance directives.
     """
-    now = datetime.now(tz=ZoneInfo("Australia/Queensland"))
+    now = queensland_now()
     response = requests.get(
         url="https://api.up.com.au/api/v1/accounts",
         headers={"Authorization": f"Bearer {token}"},

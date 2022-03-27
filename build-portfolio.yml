@@ -40,7 +40,10 @@ tasks:
       git add balances.beancount
       git commit -m "Update balances from job $JOB_URL"
       git push
-      complete-build
+  - convert-ledger: |
+      # Convert portfolio ledger to SQLite database.
+      cd portfolio-ledger
+      micromamba run --name portfolio bean-sql portfolio.beancount portfolio.sqlite
 secrets:
   # SSH key.
   - bc3fa43b-fd2d-4681-8191-603226c49d44

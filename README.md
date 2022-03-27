@@ -1,12 +1,9 @@
 # Portfolio
 
+- Use Beancount
 - [x] Create build pipeline that pings Up API.
 - [x] Generate Beancount balance directives from Up account balances.
-- [ ] Create build configuration that commits new ledger entries to repository.
-- [ ] Create a ledger of portfolio account balances and prices. (Prices are used for currency conversion.)
-  - The Beancount ledger format seems as good as any - use it.
-- [ ] Each day, automatically retrieve balances and prices and write them to the ledger.
-  - Because this is just account *balances*, not transactions, this should be simple to automate.
+- [x] Create build configuration that commits new ledger entries to repository.
 - [ ] Export Beancount ledger to SQLite.
 - [ ] Create a Datasette using the exported SQLite file.
 - [ ] Configure some pre-canned SQL queries useful for analysing the portfolio.

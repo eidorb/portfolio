@@ -25,25 +25,30 @@ tasks:
 
       # Export secrets.
       cat ~/.secrets >> ~/.buildenv
-  - update-balances: |
+  - update-ledger: |
       # Trust SSH host keys.
       echo git.sr.ht ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ+l/lvYmaeOAPeijHL8d4794Am0MOvmXPyvHTtrqvgmvCJB8pen/qkQX2S1fgl9VkMGSNxbp7NF7HmKgs5ajTGV9mB5A5zq+161lcp5+f1qmn3Dp1MWKp/AzejWXKW+dwPBd3kkudDBA1fa3uK6g1gK5nLw3qcuv/V4emX9zv3P2ZNlq9XRvBxGY2KzaCyCXVkL48RVTTJJnYbVdRuq8/jQkDRA8lHvGvKI+jqnljmZi2aIrK9OGT2gkCtfyTw2GvNDV6aZ0bEza7nDLU/I+xmByAOO79R1Uk4EYCvSc1WXDZqhiuO2sZRmVxa0pQSBDn1DB3rpvqPYW+UvKB3SOz >> ~/.ssh/known_hosts
       echo git.sr.ht ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCj6y+cJlqK3BHZRLZuM+KP2zGPrh4H66DacfliU1E2DHAd1GGwF4g1jwu3L8gOZUTIvUptqWTkmglpYhFp4Iy4= >> ~/.ssh/known_hosts
       echo git.sr.ht ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMZvRd4EtM7R+IHVMWmDkVU3VLQTSwQDSAvW0t2Tkj60 >> ~/.ssh/known_hosts
 
-      # Update balances.
+      # Configure time zone so that fetched prices have the correct date.
+      sudo timedatectl set-timezone Australia/Queensland
+
+      # Update balances and prices.
       cd portfolio-ledger
       micromamba run --name portfolio update-balances
+      micromamba run --name portfolio bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
 
       # Commit to remote repository.
       git status
       git add balances.beancount
-      git commit -m "Update balances from job $JOB_URL"
+      git add prices.beancount
+      git commit -m "Update ledger from job $JOB_URL"
       git push
   - convert-ledger: |
       # Convert portfolio ledger to SQLite database.
       cd portfolio-ledger
-      micromamba run --name portfolio bean-sql portfolio.beancount portfolio.sqlite
+      micromamba run --name portfolio bean-sql portfolio.beancount portfolio.sqlite 2>/dev/null
 secrets:
   # SSH key.
   - bc3fa43b-fd2d-4681-8191-603226c49d44

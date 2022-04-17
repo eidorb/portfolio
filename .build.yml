@@ -21,9 +21,6 @@ tasks:
 
       # Install Python dependencies.
       micromamba run --name portfolio poetry install
-
-      # Export secrets.
-      cat ~/.secrets >> ~/.buildenv
   - test: |
       cd portfolio
       micromamba activate portfolio
@@ -32,7 +29,5 @@ tasks:
 secrets:
   # SSH key.
   - bc3fa43b-fd2d-4681-8191-603226c49d44
-  # ~/.secrets file.
-  - be8c2a4b-d3a1-433f-affa-30fac28de317
   # ~/.git-crypt-key file.
   - c011ad6d-818b-4c35-a073-93ea32658da4

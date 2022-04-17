@@ -8,6 +8,8 @@ authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
 python = "^3.10"
 requests = "^2.27.1"
 beancount = "^2.3.5"
+mechanicalsoup = "^1.1.0"
+pyotp = "^2.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

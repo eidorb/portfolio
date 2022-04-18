@@ -9,6 +9,7 @@
 - [x] Create Beancount Price directives for commodoties.
 - [ ] Seed other account balances manually.
 - [x] Retrieve SelfWealth balances.
+- [x] Retrieve State Custodians balances.
 - [ ] Create a Datasette using the exported SQLite file.
 - [ ] Configure some pre-canned SQL queries useful for analysing the portfolio.
 - [ ] Include visualisations (maybe portfolio over time) using the datasette-vega plugin.

@@ -6,7 +6,7 @@ from beancount.parser import printer
 import pyotp
 
 import private
-from . import bitcoin, selfwealth, up
+from . import bitcoin, selfwealth, statecustodians, up
 
 logger = logging.getLogger(__name__)
 
@@ -38,3 +38,11 @@ def update_balances(balances_filename="balances.beancount"):
         logger.info("Retrieved SelfWealth holdings balances.")
         printer.print_entries(selfwealth_balances, file=file)
         logger.info("Wrote SelfWealth holdings balances to %s.", file.name)
+
+        state_custodians_balances = statecustodians.get_balances(
+            customer_id=private.statecustodians.customer_id,
+            password=private.statecustodians.password,
+        )
+        logger.info("Retrieved State Custodians account balances.")
+        printer.print_entries(state_custodians_balances, file=file)
+        logger.info("Wrote State Custodians account balances to %s.", file.name)

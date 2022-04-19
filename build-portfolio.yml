@@ -22,9 +22,6 @@ tasks:
 
       # Install Python dependencies.
       micromamba run --name portfolio poetry install --no-dev
-
-      # Export secrets.
-      cat ~/.secrets >> ~/.buildenv
   - update-ledger: |
       # Trust SSH host keys.
       echo git.sr.ht ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ+l/lvYmaeOAPeijHL8d4794Am0MOvmXPyvHTtrqvgmvCJB8pen/qkQX2S1fgl9VkMGSNxbp7NF7HmKgs5ajTGV9mB5A5zq+161lcp5+f1qmn3Dp1MWKp/AzejWXKW+dwPBd3kkudDBA1fa3uK6g1gK5nLw3qcuv/V4emX9zv3P2ZNlq9XRvBxGY2KzaCyCXVkL48RVTTJJnYbVdRuq8/jQkDRA8lHvGvKI+jqnljmZi2aIrK9OGT2gkCtfyTw2GvNDV6aZ0bEza7nDLU/I+xmByAOO79R1Uk4EYCvSc1WXDZqhiuO2sZRmVxa0pQSBDn1DB3rpvqPYW+UvKB3SOz >> ~/.ssh/known_hosts
@@ -34,10 +31,15 @@ tasks:
       # Configure time zone so that fetched prices have the correct date.
       sudo timedatectl set-timezone Australia/Queensland
 
+      # Unlock secrets.
+      micromamba activate portfolio
+      cd portfolio
+      git-crypt unlock ~/.git-crypt-key
+
       # Update balances and prices.
-      cd portfolio-ledger
-      micromamba run --name portfolio update-balances
-      micromamba run --name portfolio bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
+      cd ../portfolio-ledger
+      update-balances
+      bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
 
       # Commit to remote repository.
       git status
@@ -52,5 +54,5 @@ tasks:
 secrets:
   # SSH key.
   - bc3fa43b-fd2d-4681-8191-603226c49d44
-  # ~/.secrets file.
-  - be8c2a4b-d3a1-433f-affa-30fac28de317
+  # ~/.git-crypt-key file.
+  - c011ad6d-818b-4c35-a073-93ea32658da4

@@ -1,14 +1,13 @@
 import pytest
 
-import private
-from portfolio import up
+from portfolio import secrets, up
 from tests import SecretString
 
 
 @pytest.fixture
 def up_api_token():
     """Gets Up API token from environment variable."""
-    return SecretString(private.up.api_token)
+    return SecretString(secrets.up.api_token)
 
 
 def test_ping(up_api_token):

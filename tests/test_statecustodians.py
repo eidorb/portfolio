@@ -1,20 +1,18 @@
-import pyotp
 import pytest
 
-import private
-from portfolio import statecustodians
+from portfolio import secrets, statecustodians
 
 from tests import SecretString
 
 
 @pytest.fixture
 def customer_id():
-    return SecretString(private.statecustodians.customer_id)
+    return SecretString(secrets.statecustodians.customer_id)
 
 
 @pytest.fixture
 def password():
-    return SecretString(private.statecustodians.password)
+    return SecretString(secrets.statecustodians.password)
 
 
 def test_get_balances(customer_id, password):

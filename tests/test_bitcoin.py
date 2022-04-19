@@ -1,14 +1,13 @@
 import pytest
 
-import private
-from portfolio import bitcoin
+from portfolio import bitcoin, secrets
 from tests import SecretString
 
 
 @pytest.fixture
 def api_key():
     """Gets Blockonomics API key from environment variable."""
-    return SecretString(private.blockonomics.api_key)
+    return SecretString(secrets.blockonomics.api_key)
 
 
 def test_get_balance(api_key):

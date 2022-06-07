@@ -1,0 +1,68 @@
+name: update
+on:
+  # Schedule a run every 5th day of the month (except the 31st). I think this is
+  # more interesting than the same day every week.
+  schedule:
+    - cron: "0 0 1,6,11,16,21,26 * *"
+jobs:
+  update-portfolio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: eidorb/portfolio-ledger
+          token: ${{ secrets.TOKEN }}
+          path: portfolio-ledger
+      - id: cache
+        uses: actions/cache@v3
+        with:
+          # Use contents of Mamba environment file and Poetry lock file as cache key.
+          key: ${{ hashFiles('environment.yml', 'poetry.lock') }}
+          # Cache micromamba binary, config in .bashrc, Poetry binary and Mamba environment.
+          path: |
+            ./bin/micromamba
+            ~/.bashrc
+            ~/.local/bin/poetry
+            ~/micromamba/envs/portfolio
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          # Install micromamba.
+          wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+          ./bin/micromamba shell hook > ~/.bashrc
+
+          # Install Poetry.
+          curl -sSL https://install.python-poetry.org | python3 -
+
+          # Create Mamba environment.
+          source ~/.bashrc
+          micromamba create --file environment.yml --yes
+          micromamba activate portfolio
+
+          # Install Python package dependencies.
+          poetry install
+      - run: |
+          source ~/.bashrc
+          micromamba activate portfolio
+
+          # Unlock git-crypt.
+          echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
+
+          # Configure time zone so that fetched prices have the correct date.
+          sudo timedatectl set-timezone Australia/Queensland
+
+          # Update balances and prices in ledger.
+          cd portfolio-ledger
+          update-balances
+          bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
+
+          # Commit to remote repository.
+          git config user.name "GitHub Actions"
+          git config user.email "$GITHUB_JOB@$GITHUB_REPOSITORY"
+          git add balances.beancount
+          git add prices.beancount
+          git status
+          git commit -m "Update portfolio from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git push
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

@@ -1,12 +1,15 @@
-name: update
+name: deploy
 on:
-  # Schedule a run every 5th day of the month (except the 31st). I think this is
-  # more interesting than the same day every week.
-  schedule:
-    - cron: "0 0 1,6,11,16,21,26 * *"
+  push:
+    branches:
+      - master
 jobs:
-  update-portfolio:
+  deploy-portfolio:
     runs-on: ubuntu-latest
+    # Allows JWT to be requested from GitHub's OIDC provider.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
@@ -42,28 +45,22 @@ jobs:
 
           # Install Python package dependencies.
           poetry install
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2
+          aws-region: ap-southeast-2
       - run: |
           source ~/.bashrc
           micromamba activate portfolio
 
-          # Unlock git-crypt.
-          echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
+          # Install Node.js package dependencies.
+          npm ci
 
-          # Configure time zone so that fetched prices have the correct date.
-          sudo timedatectl set-timezone Australia/Queensland
+          # Bundle Lambda function dependencies.
+          poetry run bundle-lambda-function
 
-          # Update balances and prices in ledger.
-          cd portfolio-ledger
-          update-balances
-          bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
+          # Show CDK stack diff.
+           npx cdk diff
 
-          # Commit to remote repository.
-          git config user.name "GitHub Actions"
-          git config user.email "$GITHUB_JOB@$GITHUB_REPOSITORY"
-          git add balances.beancount
-          git add prices.beancount
-          git status
-          git commit -m "Update portfolio from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          git push
-        env:
-          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+          # Deploy CDK stack.
+           npx cdk deploy --require-approval never

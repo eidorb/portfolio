@@ -8,6 +8,7 @@ authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
 python = "~3.9"
 mangum = "^0.15.0"
 datasette = "^0.61.1"
+pysqlite-binary = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 

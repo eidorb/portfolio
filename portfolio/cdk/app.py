@@ -45,31 +45,23 @@ class PortfolioStack(cdk.Stack):
 
 
 def bundle_lambda_function():
-    """Bundles Lambda function dependencies for x86_64 Lambda function.
+    """Bundles Lambda function dependencies.
 
-    This bundles the correct dependencies regardless of whether we're running on
-    an M1 Mac or x86 Linux build pipeline.
+    The version of SQLite included with the Lambda runtime is old. As a workaround,
+    we install pysqlite-binary. This package contains a more recent statically linked
+    version of SQLite. Datasette checks for its presence and falls back to sqlite3
+    if not available.
 
-    Most of the dependencies are pure Python, except for PyYAML and MarkupSafe.
+    To create a bundle of dependencies targeting the x86 Lambda function architecture,
+    we take the following steps:
 
-    Additionally, the version of SQLite in the Lambda runtime is old. As a workaround,
-    we install pysqlite-binary. This package contain a more recent statically linked
-    version of SQLite.
+    - Build the Lambda function as a wheel (including database files, etc. as
+      necessary).
+    - Export requirements.txt from poetry.lock file.
+    - Install the wheel and dependencies to a directory.
 
-    So... to create a bundle of dependencies targeting the x86 Lambda function
-    architecture, we do the following steps:
-
-    - Build the Lambda function as a wheel.
-    - Install the wheel (and its dependencies) to a directory.
-    - Install PyYAML, MarkupSafe and pysqlite-binary wheels built for the
-      manylinux2014_x86_64, replacing any existing packages.
-
-    To be clear, unfortunately we cannot simply specify the manylinux2014_x86_64
-    platform when installing the wheel. The reason for this is that not all
-    dependencies offer wheels, and you cannot simultaneously specify a platform
-    and allow source builds.
-
-    Files are bundled in directory lambda-function/dist, relative to this module.
+    Files are bundled in directory lambda-function/dist/bundle, relative to this
+    module.
     """
     # Delete lambda-function/dist directory, relative to this module.
     shutil.rmtree(dist_path, ignore_errors=True)
@@ -79,33 +71,30 @@ def bundle_lambda_function():
     # file.
     subprocess.run("poetry build --format wheel".split(), cwd=dist_path.parent)
 
-    # Install dependencies to lambda-function/dist/bundle directory.
+    # Export pinned dependency versions to requirements.txt.
     subprocess.run(
         [
-            "pip",
-            "install",
-            dist_path / "lambda_function-0.1.0-py3-none-any.whl",
-            "--target",
-            dist_path / "bundle",
-        ]
+            "poetry",
+            "export",
+            "--without-hashes",
+            "--output",
+            dist_path / "requirements.txt",
+        ],
+        cwd=dist_path,
     )
 
-    # Install PyYAML and MarkupSafe wheels, specifying the manylinux2014_x86_64
-    # platform.
+    # Install Lambda function and dependencies to dist/bundle directory.
     subprocess.run(
         [
             "pip",
             "install",
-            "--upgrade",
-            "PyYAML",
-            "MarkupSafe",
-            "pysqlite-binary",
+            "lambda_function-0.1.0-py3-none-any.whl",
+            "-r",
+            "requirements.txt",
             "--target",
-            dist_path / "bundle",
-            "--platform",
-            "manylinux2014_x86_64",
-            "--only-binary=:all:",
-        ]
+            "bundle",
+        ],
+        cwd=dist_path,
     )
 
 

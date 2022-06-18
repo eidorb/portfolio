@@ -5,7 +5,7 @@ description = ""
 authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "~3.9"
 requests = "^2.27.1"
 beancount = "^2.3.5"
 mechanicalsoup = "^1.1.0"
@@ -22,3 +22,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 update-balances = "portfolio:update_balances"
+bundle-lambda-function = "portfolio.cdk.app:bundle_lambda_function"

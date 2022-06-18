@@ -82,6 +82,7 @@ mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
 tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -578,8 +579,8 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "615d4529aedf15a478b8495bed6f18b044e40d73ea9456563072f2952a927783"
+python-versions = "~3.9"
+content-hash = "0ea35ad6a0218aaeb1117251f4f06d62002fd153ae6d30a3198c448ab4b8863c"
 
 [metadata.files]
 atomicwrites = [

@@ -2,7 +2,8 @@ name: portfolio
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  # Match Lambda runtime's Python version.
+  - python=3.9
   - git-crypt=0.6
   # Version 16 is active LTS: https://nodejs.org/en/about/releases/.
   - nodejs=16

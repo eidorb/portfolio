@@ -7,6 +7,7 @@ import subprocess
 import aws_cdk as cdk
 import aws_cdk.aws_lambda as lambda_
 import aws_cdk.aws_logs as logs
+import aws_cdk.aws_ssm as ssm
 
 
 # Path to directory containing Lambda function bundle.
@@ -42,6 +43,15 @@ class PortfolioStack(cdk.Stack):
                 auth_type=lambda_.FunctionUrlAuthType.NONE
             ).url,
         )
+
+        # Grant Lambda function execution role permission to read parameters containing
+        # GitHub OAuth app client ID and secret.
+        ssm.StringParameter.from_string_parameter_name(
+            self, "ClientId", "/portfolio/github-client-id"
+        ).grant_read(function)
+        ssm.StringParameter.from_secure_string_parameter_attributes(
+            self, "ClientSecret", parameter_name="/portfolio/github-client-secret"
+        ).grant_read(function)
 
 
 def bundle_lambda_function():

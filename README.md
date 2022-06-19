@@ -1,5 +1,22 @@
 # Portfolio
 
+# Auth
+
+The Lambda function URL serving Datasette has its auth type set to `NONE`. That
+means anyone with knowledge of the URL can invoke the function.
+
+I want to control who is authorised to access my portfolio data. I use the
+[datasette-auth-github](https://datasette.io/plugins/datasette-auth-github) Datasette
+plugin to authenticate GitHub users.
+
+I registered a new OAuth application on GitHub. The application client ID and secret
+are stored in Parameter Store. The Lambda function reads the values of the parameters
+and passes them to Datasette as metadata configuration.
+
+Access to Datasette is restricted to my GitHub user ID. Forbidden requests are
+redirected to the GitHub auth page.
+
+
 - Use Beancount
 - [x] Create build pipeline that pings Up API.
 - [x] Generate Beancount balance directives from Up account balances.

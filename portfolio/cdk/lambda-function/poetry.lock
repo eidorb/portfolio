@@ -119,6 +119,34 @@ rich = ["rich"]
 test = ["pytest (>=5.2.2,<7.2.0)", "pytest-xdist (>=2.2.1,<2.6)", "pytest-asyncio (>=0.17,<0.19)", "beautifulsoup4 (>=4.8.1,<4.11.0)", "black (==22.1.0)", "pytest-timeout (>=1.4.2,<2.2)", "trustme (>=0.7,<0.10)", "cogapp (>=3.3.0)"]
 
 [[package]]
+name = "datasette-auth-github"
+version = "0.13.1"
+description = "Datasette plugin and ASGI middleware that authenticates users against GitHub"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+datasette = ">=0.51"
+
+[package.extras]
+test = ["datasette", "pytest", "pytest-asyncio", "sqlite-utils", "pytest-httpx"]
+
+[[package]]
+name = "datasette-redirect-forbidden"
+version = "0.1"
+description = "Redirect forbidden requests to a login page"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+datasette = "*"
+
+[package.extras]
+test = ["pytest", "pytest-asyncio"]
+
+[[package]]
 name = "h11"
 version = "0.12.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -361,7 +389,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchgod (>=0.6)", "p
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "fdda4df6d80947908235189ae75b559cbd2818906f3cd42b76b55edea4cd7b39"
+content-hash = "e9a89e8cbd2a762f51609d9957615464be37a4f68cacb7cd90aad52cd7f2af42"
 
 [metadata.files]
 aiofiles = [
@@ -398,6 +426,14 @@ colorama = [
 datasette = [
     {file = "datasette-0.61.1-py3-none-any.whl", hash = "sha256:96978386e8e70cf42d09016236ed32b9de742e7861b98661cbb6cab7986dd3dd"},
     {file = "datasette-0.61.1.tar.gz", hash = "sha256:060ed8737c5fc6d83e6ab35b84d91f9c0e39e3caf7d794106e39b4bef9b559eb"},
+]
+datasette-auth-github = [
+    {file = "datasette-auth-github-0.13.1.tar.gz", hash = "sha256:fe04a6e375c9990d48e92eb20f2d97c12718861cc4fead473b28b81d228b158d"},
+    {file = "datasette_auth_github-0.13.1-py3-none-any.whl", hash = "sha256:961b7cd8e111dc7f2c3935ef294d68df77b75d9f9c2edd18e85cd8af1a419a4e"},
+]
+datasette-redirect-forbidden = [
+    {file = "datasette-redirect-forbidden-0.1.tar.gz", hash = "sha256:b981018e27dd227554d55b664559249667243dc20b0d596be1a02c748f1cf144"},
+    {file = "datasette_redirect_forbidden-0.1-py3-none-any.whl", hash = "sha256:9c3579e76c94fdf9b39c57ac62e314081f6d6f69a7beae38c7cbb37934f6bfc7"},
 ]
 h11 = [
     {file = "h11-0.12.0-py3-none-any.whl", hash = "sha256:36a3cb8c0a032f56e2da7084577878a035d3b61d104230d4bd49c0c6b555a9c6"},

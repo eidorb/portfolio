@@ -9,6 +9,8 @@ python = "~3.9"
 mangum = "^0.15.0"
 datasette = "^0.61.1"
 pysqlite-binary = "^0.5.1"
+datasette-auth-github = "^0.13.1"
+datasette-redirect-forbidden = "^0.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -4,3 +4,5 @@ channels:
 dependencies:
   - python=3.10
   - git-crypt=0.6
+  # Version 16 is active LTS: https://nodejs.org/en/about/releases/.
+  - nodejs=16

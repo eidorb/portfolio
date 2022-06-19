@@ -24,6 +24,9 @@
 - Create prefix `portfolio`:
 
       micromamba create --file environment.yml --yes
+- Install Node.js dependencies:
+
+      micromamba run --name portfolio npm ci
 - Install Python dependencies:
 
       micromamba run --name portfolio poetry install

@@ -2,3 +2,4 @@ __pycache__
 node_modules/
 cdk.out/
 portfolio/cdk/lambda-function/dist/
+portfolio/cdk/lambda-function/portfolio.db

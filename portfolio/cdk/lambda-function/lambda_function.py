@@ -17,6 +17,7 @@ os.environ["GITHUB_CLIENT_SECRET"] = ssm.get_parameter(
 # Use Mangum to serve Datasette application.
 handler = Mangum(
     Datasette(
+        files=["portfolio.db"],
         metadata={
             # Restrict access to me.
             "allow": {
@@ -31,6 +32,6 @@ handler = Mangum(
                     "redirect_to": "/-/github-auth-start",
                 },
             },
-        }
+        },
     ).app()
 )

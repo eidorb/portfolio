@@ -56,14 +56,17 @@ jobs:
           source ~/.bashrc
           micromamba activate portfolio
 
-          # Install Node.js package dependencies.
-          npm ci
+          # Convert portfolio Beancount ledger to SQLite.
+          bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/lambda-function/portfolio.db 2>/dev/null
 
           # Bundle Lambda function dependencies.
           poetry run bundle-lambda-function
 
+          # Install Node.js package dependencies.
+          npm ci
+
           # Show CDK stack diff.
-           npx cdk diff
+          npx cdk diff
 
           # Deploy CDK stack.
-           npx cdk deploy --require-approval never
+          npx cdk deploy --require-approval never

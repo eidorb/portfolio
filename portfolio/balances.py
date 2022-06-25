@@ -3,7 +3,7 @@ import logging
 from beancount.parser import printer
 import pyotp
 
-from . import bitcoin, secrets, selfwealth, statecustodians, up
+from . import bitcoin, secrets, selfwealth, statecustodians, ubank, up
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 def update(filename="balances.beancount") -> None:
     """Updates ledger with latest account balances."""
     logging.basicConfig(level=logging.INFO)
+
     # Open ledger file in append mode.
     with open(filename, mode="a") as file:
         up_balances = up.get_balances(token=secrets.up.api_token)
@@ -43,3 +44,11 @@ def update(filename="balances.beancount") -> None:
         logger.info("Retrieved State Custodians account balances.")
         printer.print_entries(state_custodians_balances, file=file)
         logger.info("Wrote State Custodians account balances to %s.", file.name)
+
+        ubank_balances = ubank.get_balances(
+            username=secrets.ubank.username,
+            password=secrets.ubank.password,
+        )
+        logger.info("Retrieved UBank account balances.")
+        printer.print_entries(ubank_balances, file=file)
+        logger.info("Wrote UBank account balances to %s.", file.name)

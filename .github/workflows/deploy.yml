@@ -59,6 +59,9 @@ jobs:
           # Convert portfolio Beancount ledger to SQLite.
           bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/lambda-function/portfolio.db 2>/dev/null
 
+          # Initialise database with views.
+          sqlite3 portfolio/cdk/lambda-function/portfolio.db < portfolio/cdk/views.sql
+
           # Bundle Lambda function dependencies.
           poetry run bundle-lambda-function
 

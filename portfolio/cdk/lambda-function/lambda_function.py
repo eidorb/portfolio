@@ -33,5 +33,8 @@ handler = Mangum(
                 },
             },
         },
+        secret=ssm.get_parameter(
+            Name="/portfolio/datasette-secret", WithDecryption=True
+        )["Parameter"]["Value"],
     ).app()
 )

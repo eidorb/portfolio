@@ -52,6 +52,9 @@ class PortfolioStack(cdk.Stack):
         ssm.StringParameter.from_secure_string_parameter_attributes(
             self, "ClientSecret", parameter_name="/portfolio/github-client-secret"
         ).grant_read(function)
+        ssm.StringParameter.from_secure_string_parameter_attributes(
+            self, "DatasetteSecret", parameter_name="/portfolio/datasette-secret"
+        ).grant_read(function)
 
 
 def bundle_lambda_function():

@@ -4,6 +4,6 @@ channels:
 dependencies:
   # Match Lambda runtime's Python version.
   - python=3.9
-  - git-crypt=0.6
+  - git-crypt=0.7
   # Version 16 is active LTS: https://nodejs.org/en/about/releases/.
   - nodejs=16

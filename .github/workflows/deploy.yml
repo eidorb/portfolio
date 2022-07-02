@@ -56,8 +56,14 @@ jobs:
           source ~/.bashrc
           micromamba activate portfolio
 
+          # Unlock git-crypt.
+          echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
+
           # Convert portfolio Beancount ledger to SQLite.
           bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/portfolio.db 2>/dev/null
+
+          # Create target allocations table.
+          sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/targets.sql
 
           # Initialise database with views.
           sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/views.sql
@@ -73,3 +79,5 @@ jobs:
 
           # Deploy CDK stack.
           npx cdk deploy --require-approval never
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

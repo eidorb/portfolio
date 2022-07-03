@@ -11,7 +11,7 @@ import aws_cdk.aws_ssm as ssm
 
 
 # Path to directory containing Lambda function bundle.
-dist_path = Path(__file__).parent / "lambda-function/dist"
+dist_path = Path(__file__).parent / "dist"
 
 
 class App(cdk.App):
@@ -73,15 +73,13 @@ def bundle_lambda_function():
     - Export requirements.txt from poetry.lock file.
     - Install the wheel and dependencies to a directory.
 
-    Files are bundled in directory lambda-function/dist/bundle, relative to this
-    module.
+    Files are bundled in directory dist/bundle, relative to this module.
     """
-    # Delete lambda-function/dist directory, relative to this module.
+    # Delete dist directory, relative to this module.
     shutil.rmtree(dist_path, ignore_errors=True)
 
-    # Build the Lambda function as a Python wheel. We run the command from the Lambda
-    # function's directory in order for Poetry to see that directory's pyproject.toml
-    # file.
+    # Build the Lambda function as a Python wheel. We run the command from this
+    # modules's directory so that Poetry picks up the correct pyproject.toml file.
     subprocess.run("poetry build --format wheel".split(), cwd=dist_path.parent)
 
     # Export pinned dependency versions to requirements.txt.

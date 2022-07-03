@@ -18,19 +18,37 @@ class App(cdk.App):
     def __init__(self) -> None:
         super().__init__()
 
-        PortfolioStack(self, "Portfolio")
+        PortfolioStack(
+            self,
+            "Portfolio",
+            github_client_id_parameter_name="/portfolio/github-client-id",
+            github_client_secret_parameter_name="/portfolio/github-client-secret",
+            datasette_secret_parameter_name="/portfolio/datasette-secret",
+        )
 
 
 class PortfolioStack(cdk.Stack):
-    def __init__(self, scope, id):
+    def __init__(
+        self,
+        scope,
+        id: str,
+        github_client_id_parameter_name: str,
+        github_client_secret_parameter_name: str,
+        datasette_secret_parameter_name: str,
+    ):
         super().__init__(scope, id, description="Portfolio stack")
 
-        # Create an Lambda function with code from the bundle directory.
+        # Create a Lambda function with code from the bundle directory.
         function = lambda_.Function(
             self,
             "Function",
             code=lambda_.Code.from_asset(str(dist_path / "bundle")),
             handler="lambda_function.handler",
+            environment={
+                "GITHUB_CLIENT_ID_PARAMETER_NAME": github_client_id_parameter_name,
+                "GITHUB_CLIENT_SECRET_PARAMETER_NAME": github_client_secret_parameter_name,
+                "DATASETTE_SECRET_PARAMETER_NAME": datasette_secret_parameter_name,
+            },
             runtime=lambda_.Runtime.PYTHON_3_9,
             log_retention=logs.RetentionDays.ONE_MONTH,
         )
@@ -44,17 +62,15 @@ class PortfolioStack(cdk.Stack):
             ).url,
         )
 
-        # Grant Lambda function execution role permission to read parameters containing
-        # GitHub OAuth app client ID and secret.
-        ssm.StringParameter.from_string_parameter_name(
-            self, "ClientId", "/portfolio/github-client-id"
-        ).grant_read(function)
-        ssm.StringParameter.from_secure_string_parameter_attributes(
-            self, "ClientSecret", parameter_name="/portfolio/github-client-secret"
-        ).grant_read(function)
-        ssm.StringParameter.from_secure_string_parameter_attributes(
-            self, "DatasetteSecret", parameter_name="/portfolio/datasette-secret"
-        ).grant_read(function)
+        # Grant Lambda function execution role permission to read parameters.
+        for id, parameter_name in (
+            ("ClientId", github_client_id_parameter_name),
+            ("ClientSecret", github_client_secret_parameter_name),
+            ("DatasetteSecret", datasette_secret_parameter_name),
+        ):
+            ssm.StringParameter.from_secure_string_parameter_attributes(
+                self, id, parameter_name=parameter_name
+            ).grant_read(function)
 
 
 def bundle_lambda_function():

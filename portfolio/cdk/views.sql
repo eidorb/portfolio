@@ -101,3 +101,33 @@ select
   end as asset_class
 from
   assets;
+
+-- Calculate target allocations!
+create view target_allocations as
+with total as (
+  select
+    sum(amount_aud) as total_aud
+  from
+    asset_classes
+)
+select
+  asset_classes.asset_class,
+  sum(amount_aud) as amount_aud,
+  allocation * 100 as target_allocation,
+  round(sum(amount_aud) / total_aud * 100, 1) as allocation,
+  allocation * total_aud as target_amount_aud,
+  round(
+    (allocation - sum(amount_aud) / total_aud) * 100,
+    1
+  ) as difference_pct,
+  cast (allocation * total_aud - sum(amount_aud) as int) as increase_aud,
+  (allocation * total_aud - sum(amount_aud)) / latest_prices_aud.amount_number
+from
+  asset_classes
+  join total
+  join targets on asset_classes.asset_class = targets.asset_class
+  left join latest_prices_aud on asset_classes.amount_currency = latest_prices_aud.currency
+group by
+  asset_classes.asset_class
+order by
+  abs(allocation - sum(amount_aud) / total_aud) desc;

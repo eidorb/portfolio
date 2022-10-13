@@ -23,7 +23,7 @@ def get_balances(
     :return: List of Balance directives.
     """
     browser = mechanicalsoup.StatefulBrowser()
-    browser.open("https://secure.selfwealth.com.au")
+    browser.open("https://secure.selfwealth.com.au/Account/Login")
 
     # First, authenticate with email and password credentials.
     browser.post(

@@ -15,6 +15,7 @@ def password():
     return SecretString(secrets.ubank.password)
 
 
+@pytest.mark.skip(reason="UBank access no longer works")
 def test_get_balances(username, password):
     """Tests Balance directive is returned with expected accounts."""
     balances = ubank.get_balances(username, password)

@@ -20,5 +20,5 @@ def test_get_balance(api_key):
                 account="Bitcoin",
             ).amount.number
         )
-        == "0.13888486"
+        == "0.13917646"
     )

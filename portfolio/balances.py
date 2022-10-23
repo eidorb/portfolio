@@ -28,14 +28,19 @@ def update(filename="balances.beancount") -> None:
         printer.print_entries([bitcoin_balance], file=file)
         logger.info("Wrote Bitcoin balance to %s.", file.name)
 
-        selfwealth_balances = selfwealth.get_balances(
-            email=secrets.selfwealth.email,
-            password=secrets.selfwealth.password,
-            otp=pyotp.TOTP(secrets.selfwealth.totp_key).now(),
-        )
-        logger.info("Retrieved SelfWealth holdings balances.")
-        printer.print_entries(selfwealth_balances, file=file)
-        logger.info("Wrote SelfWealth holdings balances to %s.", file.name)
+        try:
+            selfwealth_balances = selfwealth.get_balances(
+                email=secrets.selfwealth.email,
+                password=secrets.selfwealth.password,
+                otp=pyotp.TOTP(secrets.selfwealth.totp_key).now(),
+            )
+            logger.info("Retrieved SelfWealth holdings balances.")
+            printer.print_entries(selfwealth_balances, file=file)
+            logger.info("Wrote SelfWealth holdings balances to %s.", file.name)
+        # .get_balances() started raising this exception, but only from within GitHub
+        # Actions workflows. Catch it so that other balances can still be retrieved.
+        except TypeError:
+            logger.error("Failed to get SelfWealth holdings balances.", exc_info=True)
 
         state_custodians_balances = statecustodians.get_balances(
             customer_id=secrets.statecustodians.customer_id,

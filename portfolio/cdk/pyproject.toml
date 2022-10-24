@@ -7,8 +7,8 @@ include = ["portfolio.db"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-mangum = "^0.15.0"
-datasette = "^0.61.1"
+mangum = "^0.15.1"
+datasette = "^0.62"
 pysqlite-binary = "^0.5.1"
 datasette-auth-github = "^0.13.1"
 datasette-redirect-forbidden = "^0.1"

@@ -1,111 +1,97 @@
-import pathlib
 import typing
+from datetime import datetime
 
-import mechanicalsoup
 from beancount.core.data import Amount, Balance, D
+from playwright.sync_api import sync_playwright
 
 from .common import queensland_now
 
 
-def get_balances(customer_id: str, password: str) -> list[typing.NamedTuple]:
+class Portion(typing.NamedTuple):
+    id: str
+    balance: str
+
+
+def parse_content(text: str) -> tuple[Portion, ...]:
+    """Returns values parsed from page text content."""
+    stripped_lines = (line.strip() for line in text.splitlines())
+    non_empty_lines = [line for line in stripped_lines if line]
+    # Drop the first two lines ('Home loan' and loan number).
+    lines = non_empty_lines[2:]
+    # Group into chunks of 7. e.g., ('Portion O', 'BSB: 123456 ACC: 111111111',
+    # 'BSB: 123456 ACC: 111111111', 'Available redraw', '$1.11', 'Account balance',
+    # '$2,222.22')
+    portions = zip(*([iter(lines)] * 7))
+    return tuple(
+        Portion(
+            # 'Portion O' -> 'O'.
+            id=portion[0].split()[1],
+            # Account balance.
+            balance=portion[6],
+        )
+        for portion in portions
+    )
+
+
+def convert_portions(
+    portions: typing.Iterable[Portion], datetime: datetime
+) -> list[typing.NamedTuple]:
+    """Converts portions to Beancount balance directives."""
+    balances = []
+    for portion in portions:
+        if portion.id == "O":
+            account = "Assets:StateCustodians:O"
+        else:
+            account = f"Liabilities:StateCustodians:{portion.id}"
+        balance = Balance(  # type: ignore
+            meta=dict(time=datetime.isoformat()),
+            date=datetime.date(),
+            account=account,
+            amount=Amount(
+                # Remove dollar sign from balance string.
+                D(portion.balance.replace("$", "")),
+                "AUD",
+            ),
+            tolerance=None,
+            diff_amount=None,
+        )
+        balances.append(balance)
+    return balances
+
+
+def get_balances(user_id: str, password: str) -> list[typing.NamedTuple]:
     """Returns State Custodians loan portion balances.
 
     Loan portions are liabilities (Liabilities:), offset portions are assets
     (Assets:).
 
-    :param customer_id: State Custodians customer ID.
+    :param user_id: State Custodians customer ID.
     :param password: State Custodians password.
 
     :return: List of Beancount Balance directives.
     """
-    browser = mechanicalsoup.StatefulBrowser()
-    browser.open(
-        "https://loanenquiry.com.au",
-        # Verify with certificate bundle adjacent to this module. This is required
-        # because the website does not appear to be sending a certificate bundle
-        # as it should.
-        # See https://www.sslshopper.com/ssl-checker.html#hostname=loanenquiry.com.au
-        verify=str(pathlib.Path(__file__).parent / "loanenquiry.com.au_bundle.pem"),
-    ).raise_for_status()
+
+    playwright = sync_playwright().start()
+    browser = playwright.chromium.launch()
 
     # Sign in.
-    browser.select_form()
-    browser.form["CustomerId"] = customer_id
-    browser.form["Password"] = password
-    browser.submit_selected()
+    page = browser.new_page()
+    page.goto("https://loanaccess.com.au/loanaccess")
+    page.locator("#originalU").get_by_role("textbox").click()
+    page.locator("#input-6").get_by_role("textbox").fill(user_id)
+    page.locator("#originalP").get_by_role("textbox").click()
+    page.locator("#input-7").get_by_role("textbox").fill(password)
+    page.get_by_role("button", name="LOGIN").click()
 
-    # Navigate to the loan view page.
-    browser.open_relative("/Borrower/PortionDetails")
+    # Click to expand all loan portions.
+    page.get_by_role("cell", name="Home loan").click()
 
-    now = queensland_now()
-    balances = []
+    # Extract loan portion text content from page.
+    text_content = page.locator("#counterparty-0").text_content()
 
-    # For each loan portion, select the portion and submit the form.
-    for option in browser.page.find_all("option"):
-        # nr=1 means the second (0-indexed) form on the page.
-        browser.select_form(nr=1)
-        browser["Portion"] = option.text
-        browser.submit_selected()
+    browser.close()
+    playwright.stop()
 
-        # Liabilities and assets have different signs. So, work out if it is an
-        # offset portion or not, and handle accordingly.
-        #
-        # The first td.cell-info of table#portion-details is the loan amount.
-        # If this contains "n/a", it is an offset portion, not a loan.
-        if (
-            "n/a"
-            in browser.page.find("table", id="portion-details")
-            .find("td", class_="cell-info")
-            .string
-        ):
-            balances.append(
-                Balance(
-                    meta=dict(time=now.isoformat()),
-                    date=now.date(),
-                    # Offset portions means asset account.
-                    account=f"Assets:StateCustodians:{option.text}",
-                    amount=Amount(
-                        D(
-                            # The fourth (0-indexed) td element contains the
-                            # offset balance. It's surrounded by whitespace and
-                            # a leading dollar sign.
-                            browser.page.find("table", id="portion-details")
-                            .find_all("td")[3]
-                            .string.strip()
-                            # Remove leading dollar sign.
-                            .lstrip("$")
-                        ),
-                        "AUD",
-                    ),
-                    tolerance=None,
-                    diff_amount=None,
-                )
-            )
-        else:
-            balances.append(
-                Balance(
-                    meta=dict(time=now.isoformat()),
-                    date=now.date(),
-                    # Loan portion means liability account.
-                    account=f"Liabilities:StateCustodians:{option.text}",
-                    amount=Amount(
-                        D(
-                            # Make this liability negative in value.
-                            "-"
-                            +
-                            # The second (0-indexed) td element contains the
-                            # loan balance. It's surrounded by whitespace and
-                            # a leading dollar sign.
-                            browser.page.find("table", id="portion-details")
-                            .find_all("td")[1]
-                            .string.strip()
-                            .lstrip("$")
-                        ),
-                        "AUD",
-                    ),
-                    tolerance=None,
-                    diff_amount=None,
-                )
-            )
-
+    portions = parse_content(text_content)
+    balances = convert_portions(portions, queensland_now())
     return balances

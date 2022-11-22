@@ -11,6 +11,7 @@ beancount = "^2.3.5"
 mechanicalsoup = "^1.1.0"
 pyotp = "^2.6.0"
 aws-cdk-lib = "^2.19.0"
+playwright = "^1.28.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

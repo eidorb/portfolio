@@ -12,6 +12,27 @@ def update(filename="balances.beancount") -> None:
     """Updates ledger with latest account balances."""
     logging.basicConfig(level=logging.INFO)
 
+    # Iterate over (name, get_balances) tuples. For each tuple, retrieve balances
+    # and append to ledger file.
+    for name, get_balances in (
+        (
+            "State Custodians",
+            lambda: statecustodians.get_balances(
+                user_id=secrets.statecustodians.user_id,
+                password=secrets.statecustodians.password,
+            ),
+        ),
+    ):
+        # Open ledger file in append mode.
+        with open(filename, mode="a") as file:
+            try:
+                balances = get_balances()
+                logger.info("Retrieved %s balances.", name)
+                printer.print_entries(balances, file=file)
+                logger.info("Wrote %s balances to %s.", name, file.name)
+            except Exception:
+                logger.error("Failed to get %s balances.", name, exc_info=True)
+
     # Open ledger file in append mode.
     with open(filename, mode="a") as file:
         up_balances = up.get_balances(token=secrets.up.api_token)
@@ -41,14 +62,6 @@ def update(filename="balances.beancount") -> None:
         # Actions workflows. Catch it so that other balances can still be retrieved.
         except TypeError:
             logger.error("Failed to get SelfWealth holdings balances.", exc_info=True)
-
-        state_custodians_balances = statecustodians.get_balances(
-            customer_id=secrets.statecustodians.customer_id,
-            password=secrets.statecustodians.password,
-        )
-        logger.info("Retrieved State Custodians account balances.")
-        printer.print_entries(state_custodians_balances, file=file)
-        logger.info("Wrote State Custodians account balances to %s.", file.name)
 
         bankwest_balance = bankwest.get_balance(
             pan=secrets.bankwest.pan,

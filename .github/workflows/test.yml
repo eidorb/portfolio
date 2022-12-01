@@ -1,0 +1,56 @@
+name: test
+on:
+  # Schedule weekly test run.
+  schedule:
+    - cron: "0 0 * * 0"
+  # Allow workflow to be run manually.
+  workflow_dispatch:
+jobs:
+  deploy-portfolio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: cache
+        uses: actions/cache@v3
+        with:
+          # Use contents of Mamba environment file and Poetry lock file as cache key.
+          key: ${{ hashFiles('environment.yml', 'poetry.lock') }}
+          # Cache micromamba binary, .bashrc, Poetry installation, Mamba environment,
+          # and Playwright browser cache.
+          path: |
+            ./bin/micromamba
+            ~/.bashrc
+            ~/.local/bin/poetry
+            ~/.local/share/pypoetry
+            ~/micromamba/envs/portfolio
+            ~/.cache/ms-playwright
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          # Install micromamba.
+          wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+          ./bin/micromamba shell hook > ~/.bashrc
+
+          # Install Poetry.
+          curl -sSL https://install.python-poetry.org | python3 -
+
+          # Create Mamba environment.
+          source ~/.bashrc
+          micromamba create --file environment.yml --yes
+          micromamba activate portfolio
+
+          # Install Python package dependencies.
+          poetry install
+
+          # Install Chromium for Playwright.
+          python -m playwright install chromium
+      - run: |
+          source ~/.bashrc
+          micromamba activate portfolio
+
+          # Unlock git-crypt.
+          echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
+
+          # Test
+          pytest tests
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

@@ -19,13 +19,15 @@ jobs:
         with:
           # Use contents of Mamba environment file and Poetry lock file as cache key.
           key: ${{ hashFiles('environment.yml', 'poetry.lock') }}
-          # Cache micromamba binary, .bashrc, Poetry installation and Mamba environment.
+          # Cache micromamba binary, .bashrc, Poetry installation, Mamba environment,
+          # and Playwright browser cache.
           path: |
             ./bin/micromamba
             ~/.bashrc
             ~/.local/bin/poetry
             ~/.local/share/pypoetry
             ~/micromamba/envs/portfolio
+            ~/.cache/ms-playwright
       - if: steps.cache.outputs.cache-hit != 'true'
         run: |
           # Install micromamba.
@@ -42,6 +44,9 @@ jobs:
 
           # Install Python package dependencies.
           poetry install
+
+          # Install Chromium for Playwright.
+          python -m playwright install chromium
       - run: |
           source ~/.bashrc
           micromamba activate portfolio

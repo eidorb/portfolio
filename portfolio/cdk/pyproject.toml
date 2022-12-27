@@ -12,6 +12,7 @@ datasette = "^0.63.3"
 pysqlite-binary = "^0.5.1"
 datasette-auth-github = "^0.13.1"
 datasette-redirect-forbidden = "^0.1"
+datasette-dashboards = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 

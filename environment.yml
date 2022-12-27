@@ -1,3 +1,4 @@
+# Mamba environment file.
 name: portfolio
 channels:
   - conda-forge
@@ -5,5 +6,5 @@ dependencies:
   # Match Lambda runtime's Python version.
   - python=3.9
   - git-crypt=0.7
-  # Version 16 is active LTS: https://nodejs.org/en/about/releases/.
-  - nodejs=16
+  # Version 18 is active LTS: https://nodejs.org/en/about/releases/.
+  - nodejs=18

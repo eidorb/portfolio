@@ -1,2 +1,1 @@
 /portfolio/secrets.py filter=git-crypt diff=git-crypt
-/portfolio/cdk/targets.sql filter=git-crypt diff=git-crypt

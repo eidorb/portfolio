@@ -76,7 +76,7 @@ class PortfolioStack(cdk.Stack):
             ).grant_read(function)
 
 
-def bundle_lambda_function():
+def bundle_lambda_function() -> int:
     """Bundles Lambda function dependencies.
 
     The version of SQLite included with the Lambda runtime is old. As a workaround,
@@ -97,34 +97,38 @@ def bundle_lambda_function():
     # Delete dist directory, relative to this module.
     shutil.rmtree(dist_path, ignore_errors=True)
 
-    # Build the Lambda function as a Python wheel. We run the command from this
-    # modules's directory so that Poetry picks up the correct pyproject.toml file.
-    subprocess.run("poetry build --format wheel".split(), cwd=dist_path.parent)
-
-    # Export pinned dependency versions to requirements.txt.
-    subprocess.run(
-        [
-            "poetry",
-            "export",
-            "--without-hashes",
-            "--output",
-            dist_path / "requirements.txt",
-        ],
-        cwd=dist_path,
-    )
-
-    # Install Lambda function and dependencies to dist/bundle directory.
-    subprocess.run(
-        [
-            "pip",
-            "install",
-            "lambda_function-0.1.0-py3-none-any.whl",
-            "-r",
-            "requirements.txt",
-            "--target",
-            "bundle",
-        ],
-        cwd=dist_path,
+    return (
+        # Build the Lambda function as a Python wheel. We run the command from this
+        # modules's directory so that Poetry picks up the correct pyproject.toml file.
+        subprocess.run(
+            "poetry build --format wheel".split(), cwd=dist_path.parent
+        ).returncode
+        or
+        # Export pinned dependency versions to requirements.txt.
+        subprocess.run(
+            [
+                "poetry",
+                "export",
+                "--without-hashes",
+                "--output",
+                dist_path / "requirements.txt",
+            ],
+            cwd=dist_path,
+        ).returncode
+        or
+        # Install Lambda function and dependencies to dist/bundle directory.
+        subprocess.run(
+            [
+                "pip",
+                "install",
+                "lambda_function-0.1.0-py3-none-any.whl",
+                "-r",
+                "requirements.txt",
+                "--target",
+                "bundle",
+            ],
+            cwd=dist_path,
+        ).returncode
     )
 
 

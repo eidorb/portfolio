@@ -102,8 +102,9 @@ select
 from
   assets;
 
--- Calculate target allocations!
-create view target_allocations as
+-- Calculate changes required to reach target allocations.
+create view changes as
+-- Grand total of all assets in AUD.
 with total as (
   select
     sum(amount_aud) as total_aud
@@ -112,22 +113,34 @@ with total as (
 )
 select
   asset_classes.asset_class,
-  sum(amount_aud) as amount_aud,
-  allocation * 100 as target_allocation,
-  round(sum(amount_aud) / total_aud * 100, 1) as allocation,
-  allocation * total_aud as target_amount_aud,
-  round(
-    (allocation - sum(amount_aud) / total_aud) * 100,
-    1
-  ) as difference_pct,
-  cast (allocation * total_aud - sum(amount_aud) as int) as increase_aud,
-  (allocation * total_aud - sum(amount_aud)) / latest_prices_aud.amount_number
+  -- Asset class total in asset class currency.
+  case
+    when asset_classes.asset_class == 'Cash' then sum(amount_aud)
+    else sum(asset_classes.amount_number)
+  end as amount_number,
+  -- Asset class currency.
+  case
+    when asset_classes.asset_class == 'Cash' then 'AUD'
+    else asset_classes.asset_class
+  end as amount_currency,
+  sum(amount_aud) / total_aud as allocation,
+  target_allocation,
+  -- Target in asset class currency.
+  case
+    when asset_classes.asset_class == 'Cash' then target_allocation * total_aud
+    else target_allocation * total_aud / latest_prices_aud.amount_number
+  end as target_amount_number,
+  -- Proportional change required to reach target allocation.
+  target_allocation - sum(amount_aud) / total_aud as change,
+  -- Change amount in asset currency required to reach target allocation.
+  case
+    when asset_classes.asset_class == 'Cash' then target_allocation * total_aud - sum(amount_aud)
+    else (target_allocation * total_aud - sum(amount_aud)) / latest_prices_aud.amount_number
+  end as change_amount_number
 from
   asset_classes
   join total
-  join targets on asset_classes.asset_class = targets.asset_class
+  join target_allocations on asset_classes.asset_class = target_allocations.asset_class
   left join latest_prices_aud on asset_classes.amount_currency = latest_prices_aud.currency
 group by
   asset_classes.asset_class
-order by
-  abs(allocation - sum(amount_aud) / total_aud) desc;

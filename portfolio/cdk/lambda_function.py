@@ -4,6 +4,8 @@ from datasette.app import Datasette
 from mangum import Mangum
 import boto3
 
+from metadata import metadata
+
 
 # Get client ID, secret and Datasette secret from SSM parameters.
 ssm = boto3.client("ssm")
@@ -23,21 +25,7 @@ secret = (
 handler = Mangum(
     Datasette(
         files=["portfolio.db"],
-        metadata={
-            # Restrict access to me.
-            "allow": {
-                "gh_id": "1782750",
-            },
-            "plugins": {
-                "datasette-auth-github": {
-                    "client_id": {"$env": "GITHUB_CLIENT_ID"},
-                    "client_secret": {"$env": "GITHUB_CLIENT_SECRET"},
-                },
-                "datasette-redirect-forbidden": {
-                    "redirect_to": "/-/github-auth-start",
-                },
-            },
-        },
+        metadata=metadata,
         secret=secret,
     ).app()
 )

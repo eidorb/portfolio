@@ -3,7 +3,7 @@ name = "lambda_function"
 version = "0.1.0"
 description = ""
 authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
-include = ["portfolio.db"]
+include = ["metadata.py", "portfolio.db"]
 
 [tool.poetry.dependencies]
 python = "~3.9"

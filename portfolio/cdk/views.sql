@@ -136,7 +136,9 @@ select
   case
     when asset_classes.asset_class == 'Cash' then target_allocation * total_aud - sum(amount_aud)
     else (target_allocation * total_aud - sum(amount_aud)) / latest_prices_aud.amount_number
-  end as change_amount_number
+  end as change_amount_number,
+  -- Change amount in AUD required to reach target allocation.
+  target_allocation * total_aud - sum(amount_aud) as change_amount_aud
 from
   asset_classes
   join total

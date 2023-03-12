@@ -1,5 +1,22 @@
 # Portfolio
 
+## Local development
+
+Create SQLite database from portfolio locally:
+
+    micromamba activate portfolio
+    # Convert portfolio Beancount ledger to SQLite.
+    bean-sql ../portfolio-ledger/portfolio.beancount portfolio/cdk/portfolio.db
+    # Create target allocations table.
+    sqlite3 portfolio/cdk/portfolio.db < ../portfolio-ledger/target_allocations.sql
+    # Initialise database with views.
+    sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/views.sql
+
+Serve Datasette locally:
+
+    datasette portfolio/cdk/portfolio.db --reload --metadata portfolio/cdk/metadata.json
+
+
 # Auth
 
 The Lambda function URL serving Datasette has its auth type set to `NONE`. That

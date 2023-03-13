@@ -1,8 +1,10 @@
 {
+    "title": "Portfolio dashboard",
+    "description_html": "View dashboard <a href=\"/-/dashboards/portfolio\">here</a>.",
     "plugins": {
         "datasette-dashboards": {
-            "dashboard": {
-                "title": "Portfolio allocations",
+            "portfolio": {
+                "title": "Portfolio",
                 "charts": {
                     "total": {
                         "title": "Total value",

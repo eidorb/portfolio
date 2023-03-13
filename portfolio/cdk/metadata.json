@@ -4,6 +4,15 @@
             "dashboard": {
                 "title": "Portfolio allocations",
                 "charts": {
+                    "total": {
+                        "title": "Total value",
+                        "db": "portfolio",
+                        "query": "select printf('AUD $%,d', sum(amount_aud)) as total_aud from asset_classes",
+                        "library": "metric",
+                        "display": {
+                            "field": "total_aud"
+                        }
+                    },
                     "change": {
                         "title": "Change required to reach target allocations",
                         "db": "portfolio",

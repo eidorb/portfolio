@@ -90,6 +90,64 @@
                                 }
                             ]
                         }
+                    },
+                    "steps": {
+                        "title": "Steps to rebalance",
+                        "db": "portfolio",
+                        "query": "select printf('%s %s %s', action, amount, asset) as Action, amount_aud as 'Amount (AUD)', portfolio_percentage as 'Percent of portfolio' from actions",
+                        "library": "vega",
+                        "display": {
+                            "transform": [
+                                {
+                                    "window": [
+                                        {
+                                            "op": "row_number",
+                                            "as": "row_num"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "fold": [
+                                        "Action",
+                                        "Amount (AUD)",
+                                        "Percent of portfolio"
+                                    ]
+                                }
+                            ],
+                            "mark": "text",
+                            "encoding": {
+                                "y": {
+                                    "field": "row_num",
+                                    "type": "ordinal",
+                                    "axis": null
+                                },
+                                "text": {
+                                    "field": "value",
+                                    "type": "nominal"
+                                },
+                                "x": {
+                                    "field": "key",
+                                    "type": "nominal",
+                                    "sort": null,
+                                    "axis": {
+                                        "orient": "top",
+                                        "labelAngle": 0,
+                                        "labelFontWeight": "bold",
+                                        "title": null,
+                                        "domain": false,
+                                        "ticks": false
+                                    },
+                                    "scale": {
+                                        "padding": 15
+                                    }
+                                }
+                            },
+                            "config": {
+                                "view": {
+                                    "stroke": null
+                                }
+                            }
+                        }
                     }
                 }
             }

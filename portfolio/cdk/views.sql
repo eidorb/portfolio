@@ -145,4 +145,24 @@ from
   join target_allocations on asset_classes.asset_class = target_allocations.asset_class
   left join latest_prices_aud on asset_classes.amount_currency = latest_prices_aud.currency
 group by
-  asset_classes.asset_class
+  asset_classes.asset_class;
+
+-- Calculate actions required to reach target allocations.
+create view actions as
+select
+  case
+    when change > 0 then 'Buy'
+    else 'Sell'
+  end as action,
+  -- BTC has more precision.
+  case
+    when asset_class in ('BTC') then format('%.5f', abs(change_amount_number))
+    else format('%.0f', abs(change_amount_number))
+  end as amount,
+  amount_currency as asset,
+  format('$%,d', abs(change_amount_aud)) as amount_aud,
+  format('%.1f %%', abs(change) * 100, 1) as portfolio_percentage
+from
+  changes
+order by
+  abs(change) desc;

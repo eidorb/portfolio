@@ -30,9 +30,11 @@ I registered a new OAuth application on GitHub. The application client ID and se
 are stored in Parameter Store. The Lambda function reads the values of the parameters
 and passes them to Datasette as metadata configuration.
 
+The GitHub OAuth application must have its *Authorization callback URL* setting
+set to https://portfolio.brodie.id.au/-/github-auth-callback.
+
 Access to Datasette is restricted to my GitHub user ID. Forbidden requests are
 redirected to the GitHub auth page.
-
 
 - Use Beancount
 - [x] Create build pipeline that pings Up API.

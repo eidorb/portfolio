@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "lambda_function"
+name = "function"
 version = "0.1.0"
 description = ""
 authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]

@@ -6,15 +6,15 @@ Create SQLite database from portfolio locally:
 
     micromamba activate portfolio
     # Convert portfolio Beancount ledger to SQLite.
-    bean-sql ../portfolio-ledger/portfolio.beancount portfolio/cdk/portfolio.db
+    bean-sql ../portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db
     # Create target allocations table.
-    sqlite3 portfolio/cdk/portfolio.db < ../portfolio-ledger/target_allocations.sql
+    sqlite3 portfolio/cdk/function/portfolio.db < ../portfolio-ledger/target_allocations.sql
     # Initialise database with views.
-    sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/views.sql
+    sqlite3 portfolio/cdk/function/portfolio.db < views.sql
 
 Serve Datasette locally:
 
-    datasette portfolio/cdk/portfolio.db --reload --metadata portfolio/cdk/metadata.json
+    datasette portfolio/cdk/function/portfolio.db --reload --metadata portfolio/cdk/function/metadata.json
 
 
 # Auth

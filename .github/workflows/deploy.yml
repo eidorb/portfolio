@@ -60,13 +60,13 @@ jobs:
           echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
 
           # Convert portfolio Beancount ledger to SQLite.
-          bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/portfolio.db 2>/dev/null
+          bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db 2>/dev/null
 
           # Create target allocations table.
-          sqlite3 portfolio/cdk/portfolio.db < portfolio-ledger/target_allocations.sql
+          sqlite3 portfolio/cdk/function/portfolio.db < portfolio-ledger/target_allocations.sql
 
           # Initialise database with views.
-          sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/views.sql
+          sqlite3 portfolio/cdk/function/portfolio.db < views.sql
 
           # Install Node.js package dependencies.
           npm ci

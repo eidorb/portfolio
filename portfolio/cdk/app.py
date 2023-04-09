@@ -33,14 +33,14 @@ class PortfolioStack(cdk.Stack):
     ):
         super().__init__(scope, id, description="Portfolio stack")
 
-        # Package the Lambda function defined by poetry.lock in this directory.
+        # Package the Lambda function defined in subdirectory function.
         python_function = python.PythonFunction(
             self,
             "PythonFunction",
-            entry=str(Path(__file__).parent),
+            entry=str(Path(__file__).parent / "function"),
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="handler",
-            index="lambda_function.py",
+            index="index.py",
             environment={
                 "GITHUB_CLIENT_ID_PARAMETER_NAME": github_client_id_parameter_name,
                 "GITHUB_CLIENT_SECRET_PARAMETER_NAME": github_client_secret_parameter_name,

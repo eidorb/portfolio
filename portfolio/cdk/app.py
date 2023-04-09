@@ -1,7 +1,5 @@
 """Portfolio AWS CDK app."""
 from pathlib import Path
-import shutil
-import subprocess
 
 
 import aws_cdk as cdk
@@ -9,10 +7,6 @@ import aws_cdk.aws_lambda as lambda_
 import aws_cdk.aws_logs as logs
 import aws_cdk.aws_ssm as ssm
 import aws_cdk.aws_lambda_python_alpha as python
-
-
-# Path to directory containing Lambda function bundle.
-dist_path = Path(__file__).parent / "dist"
 
 
 class App(cdk.App):
@@ -76,62 +70,6 @@ class PortfolioStack(cdk.Stack):
             ssm.StringParameter.from_secure_string_parameter_attributes(
                 self, id, parameter_name=parameter_name
             ).grant_read(python_function)
-
-
-def bundle_lambda_function() -> int:
-    """Bundles Lambda function dependencies.
-
-    The version of SQLite included with the Lambda runtime is old. As a workaround,
-    we install pysqlite-binary. This package contains a more recent statically linked
-    version of SQLite. Datasette checks for its presence and falls back to sqlite3
-    if not available.
-
-    To create a bundle of dependencies targeting the x86 Lambda function architecture,
-    we take the following steps:
-
-    - Build the Lambda function as a wheel (including database files, etc. as
-      necessary).
-    - Export requirements.txt from poetry.lock file.
-    - Install the wheel and dependencies to a directory.
-
-    Files are bundled in directory dist/bundle, relative to this module.
-    """
-    # Delete dist directory, relative to this module.
-    shutil.rmtree(dist_path, ignore_errors=True)
-
-    return (
-        # Build the Lambda function as a Python wheel. We run the command from this
-        # modules's directory so that Poetry picks up the correct pyproject.toml file.
-        subprocess.run(
-            "poetry build --format wheel".split(), cwd=dist_path.parent
-        ).returncode
-        or
-        # Export pinned dependency versions to requirements.txt.
-        subprocess.run(
-            [
-                "poetry",
-                "export",
-                "--without-hashes",
-                "--output",
-                dist_path / "requirements.txt",
-            ],
-            cwd=dist_path,
-        ).returncode
-        or
-        # Install Lambda function and dependencies to dist/bundle directory.
-        subprocess.run(
-            [
-                "pip",
-                "install",
-                "lambda_function-0.1.0-py3-none-any.whl",
-                "-r",
-                "requirements.txt",
-                "--target",
-                "bundle",
-            ],
-            cwd=dist_path,
-        ).returncode
-    )
 
 
 if __name__ == "__main__":

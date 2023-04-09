@@ -68,9 +68,6 @@ jobs:
           # Initialise database with views.
           sqlite3 portfolio/cdk/portfolio.db < portfolio/cdk/views.sql
 
-          # Bundle Lambda function dependencies.
-          poetry run bundle-lambda-function
-
           # Install Node.js package dependencies.
           npm ci
 

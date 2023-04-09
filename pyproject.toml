@@ -24,4 +24,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 update-balances = "portfolio.balances:update"
-bundle-lambda-function = "portfolio.cdk.app:bundle_lambda_function"

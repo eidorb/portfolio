@@ -8,6 +8,7 @@ import aws_cdk as cdk
 import aws_cdk.aws_lambda as lambda_
 import aws_cdk.aws_logs as logs
 import aws_cdk.aws_ssm as ssm
+import aws_cdk.aws_lambda_python_alpha as python
 
 
 # Path to directory containing Lambda function bundle.
@@ -38,18 +39,19 @@ class PortfolioStack(cdk.Stack):
     ):
         super().__init__(scope, id, description="Portfolio stack")
 
-        # Create a Lambda function with code from the bundle directory.
-        function = lambda_.Function(
+        # Package the Lambda function defined by poetry.lock in this directory.
+        python_function = python.PythonFunction(
             self,
-            "Function",
-            code=lambda_.Code.from_asset(str(dist_path / "bundle")),
-            handler="lambda_function.handler",
+            "PythonFunction",
+            entry=str(Path(__file__).parent),
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="handler",
+            index="lambda_function.py",
             environment={
                 "GITHUB_CLIENT_ID_PARAMETER_NAME": github_client_id_parameter_name,
                 "GITHUB_CLIENT_SECRET_PARAMETER_NAME": github_client_secret_parameter_name,
                 "DATASETTE_SECRET_PARAMETER_NAME": datasette_secret_parameter_name,
             },
-            runtime=lambda_.Runtime.PYTHON_3_9,
             log_retention=logs.RetentionDays.ONE_MONTH,
             memory_size=256,
             timeout=cdk.Duration.seconds(10),
@@ -60,7 +62,7 @@ class PortfolioStack(cdk.Stack):
         cdk.CfnOutput(
             self,
             "FunctionUrl",
-            value=function.add_function_url(
+            value=python_function.add_function_url(
                 auth_type=lambda_.FunctionUrlAuthType.NONE
             ).url,
         )
@@ -73,7 +75,7 @@ class PortfolioStack(cdk.Stack):
         ):
             ssm.StringParameter.from_secure_string_parameter_attributes(
                 self, id, parameter_name=parameter_name
-            ).grant_read(function)
+            ).grant_read(python_function)
 
 
 def bundle_lambda_function() -> int:

@@ -50,11 +50,6 @@ class PortfolioStack(cdk.Stack):
             retry_attempts=0,
         )
 
-        # Turn the Lambda function into a web server with a function URL 🪄.
-        python_function_url = python_function.add_function_url(
-            auth_type=lambda_.FunctionUrlAuthType.NONE
-        )
-
         # Grant Lambda function execution role permission to read parameters.
         for index, parameter_name in enumerate(
             (
@@ -92,13 +87,15 @@ class PortfolioStack(cdk.Stack):
             default_behavior=cloudfront.BehaviorOptions(
                 # Disable CloudFront caching.
                 cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
-                # Forward all except host header to origin. Lambda function URLs
-                # expect the host header to contain the origin domain, not the
-                # CloudFront domain name.
-                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
-                origin=origins.HttpOrigin(
-                    domain_name=cdk.Fn.parse_domain_name(python_function_url.url)
-                ),
+                edge_lambdas=[
+                    cloudfront.EdgeLambda(
+                        event_type=cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+                        function_version=python_function.current_version,
+                        include_body=True,
+                    )
+                ],
+                # Use a placeholder domain name because origin will never be fetched.
+                origin=origins.HttpOrigin(domain_name="example.com"),
             ),
             certificate=certificate,
             domain_names=[domain_name],

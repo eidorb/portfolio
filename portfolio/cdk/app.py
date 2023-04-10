@@ -16,46 +16,8 @@ import aws_cdk.aws_ssm as ssm
 class App(cdk.App):
     def __init__(self) -> None:
         super().__init__()
-        PortfolioCertificateStack(self, "PortfolioCertificate")
         PortfolioStack(self, "Portfolio")
         cdk.Tags.of(self).add("project", "portfolio")
-
-
-class PortfolioCertificateStack(cdk.Stack):
-    """The CloudFront distribution custom certificate lives in a separate stack
-    because certificates used for CloudFront distributions must be in a specific
-    region: us-east-1.
-
-    Domain name, hosted zone and certificate are exposed as attributes. These are
-    referenced by the other stack.
-    """
-
-    def __init__(self, scope, id: str):
-
-        super().__init__(
-            scope,
-            id,
-            cross_region_references=True,
-            description="Portfolio certificate stack",
-            env=cdk.Environment(region="us-east-1"),
-        )
-
-        # Reference existing hosted zone.
-        self.hosted_zone = route53.PublicHostedZone.from_public_hosted_zone_attributes(
-            self,
-            "HostedZone",
-            hosted_zone_id="Z0932427366G4DNP1CWB",
-            zone_name="brodie.id.au",
-        )
-
-        self.domain_name = "portfolio.brodie.id.au"
-
-        self.certificate = acm.Certificate(
-            self,
-            "Certificate",
-            domain_name=self.domain_name,
-            validation=acm.CertificateValidation.from_dns(self.hosted_zone),
-        )
 
 
 class PortfolioStack(cdk.Stack):

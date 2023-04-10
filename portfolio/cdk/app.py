@@ -31,8 +31,8 @@ class PortfolioStack(cdk.Stack):
             id,
             cross_region_references=True,
             description="Portfolio",
-            # CloudFront certificates must be in us-east-1; so, for simplicity,
-            # put everything in us-east-1.
+            # CloudFront certificates and Lambda@Edge functions must be defined
+            # in us-east-1. So, for simplicity, put everything in us-east-1.
             env=cdk.Environment(region="us-east-1"),
         )
 
@@ -79,17 +79,18 @@ class PortfolioStack(cdk.Stack):
             validation=acm.CertificateValidation.from_dns(hosted_zone),
         )
 
-        # Create a CloudFront distribution that serves content from the Lambda
-        # function URL origin.
+        # Create a CloudFront distribution that serves content from Lambda@Edge.
         distribution = cloudfront.Distribution(
             self,
             "Distribution",
             default_behavior=cloudfront.BehaviorOptions(
                 # Disable CloudFront caching.
                 cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+                # Forward everything from the viewer request to Lambda@Edge function.
+                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
                 edge_lambdas=[
                     cloudfront.EdgeLambda(
-                        event_type=cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+                        event_type=cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
                         function_version=python_function.current_version,
                         include_body=True,
                     )

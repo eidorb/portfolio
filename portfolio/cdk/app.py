@@ -16,16 +16,8 @@ import aws_cdk.aws_ssm as ssm
 class App(cdk.App):
     def __init__(self) -> None:
         super().__init__()
-
         PortfolioCertificateStack(self, "PortfolioCertificate")
-        PortfolioStack(
-            self,
-            "Portfolio",
-            github_client_id_parameter_name="/portfolio/github-client-id",
-            github_client_secret_parameter_name="/portfolio/github-client-secret",
-            datasette_secret_parameter_name="/portfolio/datasette-secret",
-        )
-
+        PortfolioStack(self, "Portfolio")
         cdk.Tags.of(self).add("project", "portfolio")
 
 
@@ -71,9 +63,6 @@ class PortfolioStack(cdk.Stack):
         self,
         scope,
         id: str,
-        github_client_id_parameter_name: str,
-        github_client_secret_parameter_name: str,
-        datasette_secret_parameter_name: str,
     ):
         super().__init__(
             scope,
@@ -85,7 +74,7 @@ class PortfolioStack(cdk.Stack):
             env=cdk.Environment(region="us-east-1"),
         )
 
-        # Package the Lambda function defined in subdirectory `./function`.
+        # Package the Lambda function contained within subdirectory `./function`.
         python_function = python.PythonFunction(
             self,
             "PythonFunction",
@@ -93,11 +82,6 @@ class PortfolioStack(cdk.Stack):
             runtime=lambda_.Runtime.PYTHON_3_9,
             handler="handler",
             index="index.py",
-            environment={
-                "GITHUB_CLIENT_ID_PARAMETER_NAME": github_client_id_parameter_name,
-                "GITHUB_CLIENT_SECRET_PARAMETER_NAME": github_client_secret_parameter_name,
-                "DATASETTE_SECRET_PARAMETER_NAME": datasette_secret_parameter_name,
-            },
             log_retention=logs.RetentionDays.ONE_MONTH,
             memory_size=256,
             timeout=cdk.Duration.seconds(10),
@@ -110,13 +94,15 @@ class PortfolioStack(cdk.Stack):
         )
 
         # Grant Lambda function execution role permission to read parameters.
-        for id, parameter_name in (
-            ("ClientId", github_client_id_parameter_name),
-            ("ClientSecret", github_client_secret_parameter_name),
-            ("DatasetteSecret", datasette_secret_parameter_name),
+        for index, parameter_name in enumerate(
+            (
+                "/portfolio/github-client-id",
+                "/portfolio/github-client-secret",
+                "/portfolio/datasette-secret",
+            )
         ):
             ssm.StringParameter.from_secure_string_parameter_attributes(
-                self, id, parameter_name=parameter_name
+                self, f"Parameter{index}", parameter_name=parameter_name
             ).grant_read(python_function)
 
         # Reference existing hosted zone.

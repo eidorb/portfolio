@@ -31,16 +31,16 @@ metadata["plugins"].update(
 
 # Get client ID, secret and Datasette secret from SSM parameters.
 ssm = boto3.client("ssm")
-os.environ["GITHUB_CLIENT_ID"] = ssm.get_parameter(
-    Name=os.environ["GITHUB_CLIENT_ID_PARAMETER_NAME"]
-)["Parameter"]["Value"]
+os.environ["GITHUB_CLIENT_ID"] = ssm.get_parameter(Name="/portfolio/github-client-id")[
+    "Parameter"
+]["Value"]
 os.environ["GITHUB_CLIENT_SECRET"] = ssm.get_parameter(
-    Name=os.environ["GITHUB_CLIENT_SECRET_PARAMETER_NAME"], WithDecryption=True
+    Name="/portfolio/github-client-secret", WithDecryption=True
 )["Parameter"]["Value"]
 secret = (
-    ssm.get_parameter(
-        Name=os.environ["DATASETTE_SECRET_PARAMETER_NAME"], WithDecryption=True
-    )["Parameter"]["Value"],
+    ssm.get_parameter(Name="/portfolio/datasette-secret", WithDecryption=True)[
+        "Parameter"
+    ]["Value"],
 )
 
 # Use Mangum to serve Datasette application.

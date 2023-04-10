@@ -17,16 +17,13 @@ class App(cdk.App):
     def __init__(self) -> None:
         super().__init__()
 
+        PortfolioCertificateStack(self, "PortfolioCertificate")
         PortfolioStack(
             self,
             "Portfolio",
             github_client_id_parameter_name="/portfolio/github-client-id",
             github_client_secret_parameter_name="/portfolio/github-client-secret",
             datasette_secret_parameter_name="/portfolio/datasette-secret",
-            certificate_stack=PortfolioCertificateStack(
-                self,
-                "PortfolioCertificate",
-            ),
         )
 
         cdk.Tags.of(self).add("project", "portfolio")
@@ -77,15 +74,15 @@ class PortfolioStack(cdk.Stack):
         github_client_id_parameter_name: str,
         github_client_secret_parameter_name: str,
         datasette_secret_parameter_name: str,
-        certificate_stack: PortfolioCertificateStack,
     ):
         super().__init__(
             scope,
             id,
             cross_region_references=True,
-            description="Portfolio stack",
-            # Stacks involved in cross-region references must have regions specified.
-            env=cdk.Environment(region="ap-southeast-2"),
+            description="Portfolio",
+            # CloudFront certificates must be in us-east-1; so, for simplicity,
+            # put everything in us-east-1.
+            env=cdk.Environment(region="us-east-1"),
         )
 
         # Package the Lambda function defined in subdirectory `./function`.
@@ -122,6 +119,23 @@ class PortfolioStack(cdk.Stack):
                 self, id, parameter_name=parameter_name
             ).grant_read(python_function)
 
+        # Reference existing hosted zone.
+        hosted_zone = route53.PublicHostedZone.from_public_hosted_zone_attributes(
+            self,
+            "HostedZone",
+            hosted_zone_id="Z0932427366G4DNP1CWB",
+            zone_name="brodie.id.au",
+        )
+
+        domain_name = "portfolio.brodie.id.au"
+
+        certificate = acm.Certificate(
+            self,
+            "Certificate",
+            domain_name=domain_name,
+            validation=acm.CertificateValidation.from_dns(hosted_zone),
+        )
+
         # Create a CloudFront distribution that serves content from the Lambda
         # function URL origin.
         distribution = cloudfront.Distribution(
@@ -138,8 +152,8 @@ class PortfolioStack(cdk.Stack):
                     domain_name=cdk.Fn.parse_domain_name(python_function_url.url)
                 ),
             ),
-            certificate=certificate_stack.certificate,
-            domain_names=[certificate_stack.domain_name],
+            certificate=certificate,
+            domain_names=[domain_name],
         )
 
         # Create an alias record for the CloudFront distribution.
@@ -149,8 +163,8 @@ class PortfolioStack(cdk.Stack):
             target=route53.RecordTarget.from_alias(
                 route53_targets.CloudFrontTarget(distribution)
             ),
-            zone=certificate_stack.hosted_zone,
-            record_name=certificate_stack.domain_name,
+            zone=hosted_zone,
+            record_name=domain_name,
         )
 
 

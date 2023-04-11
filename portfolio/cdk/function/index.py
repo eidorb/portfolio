@@ -53,5 +53,7 @@ handler = Mangum(
         secret=ssm.get_parameter(
             Name="/portfolio/datasette-secret", WithDecryption=True
         )["Parameter"]["Value"],
-    ).app()
+    ).app(),
+    # Content-Length header is not allowed in Lambda@Edge responses.
+    exclude_headers=["Content-Length"],
 )

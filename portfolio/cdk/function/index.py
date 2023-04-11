@@ -47,7 +47,8 @@ os.environ["GITHUB_CLIENT_SECRET"] = ssm.get_parameter(
 # Use Mangum to serve Datasette application.
 handler = Mangum(
     Datasette(
-        files=["portfolio.db"],
+        # Open database in immutable mode for improved performance.
+        immutables=["portfolio.db"],
         metadata=metadata,
         # Import Datasette secret from SSM parameter.
         secret=ssm.get_parameter(

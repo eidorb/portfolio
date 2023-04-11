@@ -163,6 +163,20 @@ datasette-render-markdown = "*"
 test = ["faker", "pytest", "pytest-asyncio", "sqlite-utils"]
 
 [[package]]
+name = "datasette-hashed-urls"
+version = "0.4"
+description = "Optimize Datasette performance behind a caching proxy"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+datasette = ">=0.61.1"
+
+[package.extras]
+test = ["pytest", "pytest-asyncio", "sqlite-utils"]
+
+[[package]]
 name = "datasette-redirect-forbidden"
 version = "0.1"
 description = "Redirect forbidden requests to a login page"
@@ -480,7 +494,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "0f1c6ffa4775528a7a34f672883d2bb3f1fdf909db14dbeedccab40f22e51032"
+content-hash = "ddafbb7ff4be31d752ea6e8f0597519b20b49cf9a545b3c06d9ca8f6be692d40"
 
 [metadata.files]
 aiofiles = [
@@ -510,6 +524,7 @@ datasette-auth-github = [
     {file = "datasette_auth_github-0.13.1-py3-none-any.whl", hash = "sha256:961b7cd8e111dc7f2c3935ef294d68df77b75d9f9c2edd18e85cd8af1a419a4e"},
 ]
 datasette-dashboards = []
+datasette-hashed-urls = []
 datasette-redirect-forbidden = [
     {file = "datasette-redirect-forbidden-0.1.tar.gz", hash = "sha256:b981018e27dd227554d55b664559249667243dc20b0d596be1a02c748f1cf144"},
     {file = "datasette_redirect_forbidden-0.1-py3-none-any.whl", hash = "sha256:9c3579e76c94fdf9b39c57ac62e314081f6d6f69a7beae38c7cbb37934f6bfc7"},

@@ -3,7 +3,6 @@ name = "function"
 version = "0.1.0"
 description = ""
 authors = ["Brodie Blackburn <brodie.blackburn@gmail.com>"]
-include = ["metadata.json", "portfolio.db"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
@@ -13,6 +12,7 @@ pysqlite-binary = "^0.5.1"
 datasette-auth-github = "^0.13.1"
 datasette-redirect-forbidden = "^0.1"
 datasette-dashboards = "^0.2.1"
+datasette-hashed-urls = "^0.4"
 
 [tool.poetry.dev-dependencies]
 

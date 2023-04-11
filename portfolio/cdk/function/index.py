@@ -49,6 +49,8 @@ handler = Mangum(
     Datasette(
         # Open database in immutable mode for improved performance.
         immutables=["portfolio.db"],
+        # Load precalculated counts from file.
+        inspect_data=json.load((Path(__file__).parent / "inspect_data.json").open()),
         metadata=metadata,
         # Import Datasette secret from SSM parameter.
         secret=ssm.get_parameter(

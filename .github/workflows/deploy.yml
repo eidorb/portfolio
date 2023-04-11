@@ -68,6 +68,9 @@ jobs:
           # Initialise database with views.
           sqlite3 portfolio/cdk/function/portfolio.db < views.sql
 
+          # Precalculate table counts for immutable mode.
+          datasette inspect portfolio/cdk/function/portfolio.db --inspect-file=portfolio/cdk/function/inspect_data.json
+
           # Install Node.js package dependencies.
           npm ci
 

@@ -95,6 +95,7 @@ class PortfolioStack(cdk.Stack):
                         include_body=True,
                     )
                 ],
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
                 # Use a placeholder domain name because origin will never be fetched.
                 origin=origins.HttpOrigin(domain_name="example.com"),
             ),

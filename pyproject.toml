@@ -13,6 +13,7 @@ pyotp = "^2.6.0"
 aws-cdk-lib = "^2.19.0"
 playwright = "^1.28.0"
 "aws-cdk.aws-lambda-python-alpha" = "^2.73.0-alpha.0"
+datasette = "^0.64.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

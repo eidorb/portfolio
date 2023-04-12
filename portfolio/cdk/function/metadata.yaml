@@ -1,4 +1,4 @@
-title: Portfolio dashboard
+title: Portfolio
 description_html: View dashboard <a href="/-/dashboards/portfolio">here</a>.
 plugins:
   datasette-dashboards:
@@ -7,14 +7,14 @@ plugins:
       filters: {}
       charts:
         total:
-          title: Total value
+          title: Total portfolio value
           db: portfolio
           query: select printf('AUD $%,d', sum(amount_aud)) as total_aud from asset_classes
           library: metric
           display:
             field: total_aud
         change:
-          title: Change required to reach target allocations
+          title: Percentage change required to reach target allocations
           db: portfolio
           query: select * from changes order by change desc
           library: vega-lite
@@ -65,42 +65,15 @@ plugins:
         steps:
           title: Steps to rebalance
           db: portfolio
-          query:
-            select printf('%s %s %s', action, amount, asset) as Action, amount_aud
-            as 'Amount (AUD)', portfolio_percentage as 'Percent of portfolio' from
-            actions
-          library: vega-lite
-          display:
-            transform:
-              - window:
-                  - op: row_number
-                    as: row_num
-              - fold:
-                  - Action
-                  - Amount (AUD)
-                  - Percent of portfolio
-            mark: text
-            encoding:
-              y:
-                field: row_num
-                type: ordinal
-                axis: null
-              text:
-                field: value
-                type: nominal
-              x:
-                field: key
-                type: nominal
-                sort: null
-                axis:
-                  orient: top
-                  labelAngle: 0
-                  labelFontWeight: bold
-                  title: null
-                  domain: false
-                  ticks: false
-                scale:
-                  padding: 15
-            config:
-              view:
-                stroke: null
+          query: |
+            select
+              case
+                when action == 'Buy' then '<span style="color: limegreen">Buy</span>'
+                else '<span style="color: red">Sell</span>'
+              end as '<strong>Action</strong>',
+              printf('%s %s', amount, asset) as '<strong>Asset</strong>',
+              amount_aud as '<strong>Value (AUD)</strong>',
+              portfolio_percentage as '<strong>Percentage of portfolio</strong>'
+            from
+              actions
+          library: table

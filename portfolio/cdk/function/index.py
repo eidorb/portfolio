@@ -3,13 +3,14 @@ import os
 from pathlib import Path
 
 import boto3
+import yaml
 from datasette.app import Datasette
 from mangum import Mangum
 
 
 # Load base metadata from file. This is enough to run locally without authentication
 # and authorization. Additional production metadata is added below.
-metadata = json.load((Path(__file__).parent / "metadata.json").open())
+metadata = yaml.safe_load((Path(__file__).parent / "metadata.yaml").open())
 
 # Restrict access to me.
 metadata["allow"] = {

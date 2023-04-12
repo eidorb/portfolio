@@ -14,7 +14,7 @@ Create SQLite database from portfolio locally:
 
 Serve Datasette locally:
 
-    datasette portfolio/cdk/function/portfolio.db --reload --metadata portfolio/cdk/function/metadata.json
+    datasette portfolio/cdk/function/portfolio.db --reload --metadata portfolio/cdk/function/metadata.yaml
 
 
 # Auth

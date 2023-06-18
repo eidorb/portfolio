@@ -6,6 +6,39 @@ plugins:
       title: Portfolio
       filters: {}
       charts:
+        value:
+          title: Asset value (AUD) over time
+          db: portfolio
+          query: |
+            select
+              date,
+              asset as Asset,
+              round(sum(value_number)) as value
+            from
+              normalised_balance_aud
+            where
+              account not like 'Liabilities:StateCustodians:%'
+            group by
+              date,
+              Asset
+          library: vega-lite
+          display:
+            mark:
+              type: area
+              tooltip: true
+            encoding:
+              x:
+                timeUnit: yearmonthdate
+                field: date
+                title: Date
+              y:
+                aggregate: sum
+                field: value
+                title: Total value (AUD)
+              color:
+                field: Asset
+                scale:
+                  scheme: pastel1
         total:
           title: Total portfolio value
           db: portfolio

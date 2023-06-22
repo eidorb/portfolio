@@ -36,6 +36,36 @@ set to https://portfolio.brodie.id.au/-/github-auth-callback.
 Access to Datasette is restricted to my GitHub user ID. Forbidden requests are
 redirected to the GitHub auth page.
 
+
+# Upgrading dependencies
+
+```bash
+micromamba activate portfolio
+```
+
+
+## Upgrade CDK Toolkit
+
+```bash
+npm update aws-cdk
+```
+
+
+## Upgrade Python dependencies
+
+```bash
+poetry update
+```
+
+
+## Upgrade Lambda function dependencies
+
+```bash
+cd portfolio/cdk/function
+poetry update
+cd -
+```
+
 - Use Beancount
 - [x] Create build pipeline that pings Up API.
 - [x] Generate Beancount balance directives from Up account balances.

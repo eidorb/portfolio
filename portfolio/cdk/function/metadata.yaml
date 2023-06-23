@@ -7,7 +7,7 @@ plugins:
       filters: {}
       charts:
         value:
-          title: Asset value (AUD) over time
+          title: Asset value over time
           db: portfolio
           query: |
             select
@@ -34,7 +34,9 @@ plugins:
               y:
                 aggregate: sum
                 field: value
-                title: Total value (AUD)
+                title: Value
+                axis:
+                  labelExpr: "'$'+datum.label"
               color:
                 field: Asset
                 scale:

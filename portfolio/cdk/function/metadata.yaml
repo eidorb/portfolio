@@ -12,20 +12,22 @@ plugins:
           query: |
             select
               date,
-              asset as Asset,
-              round(sum(value_number)) as value
+              normalised_balance_aud.asset as Asset,
+              round(sum(value_number)) as value,
+              target_allocation.rowid as rank
             from
               normalised_balance_aud
+              join target_allocation on normalised_balance_aud.asset = target_allocation.asset
             where
               account not like 'Liabilities:StateCustodians:%'
             group by
               date,
-              Asset
+              normalised_balance_aud.Asset
           library: vega-lite
           display:
             mark:
               type: area
-              tooltip: true
+              opacity: 0.85
             encoding:
               x:
                 timeUnit: yearmonthdate
@@ -41,6 +43,11 @@ plugins:
                 field: Asset
                 scale:
                   scheme: pastel1
+                sort:
+                  field: rank
+                  order: descending
+              order:
+                field: rank
         total:
           title: Total portfolio value
           db: portfolio

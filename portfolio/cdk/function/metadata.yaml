@@ -49,12 +49,12 @@ plugins:
               order:
                 field: rank
         total:
-          title: Total portfolio value
+          title: Total value
           db: portfolio
-          query: select printf('AUD $%,d', sum(amount_aud)) as total_aud from asset_classes
+          query: select printf('$%,d', total) as total from change
           library: metric
           display:
-            field: total_aud
+            field: total
         change:
           title: Percentage change required to reach target allocations
           db: portfolio

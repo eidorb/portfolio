@@ -6,48 +6,57 @@ plugins:
       title: Portfolio
       filters: {}
       charts:
-        value:
-          title: Asset value over time
+        summary:
+          title: Summary
           db: portfolio
           query: |
             select
-              date,
-              normalised_balance_aud.asset as Asset,
-              round(sum(value_number)) as value,
-              target_allocation.rowid as rank
+              format('<strong>%s</strong>', asset) as '',
+              case
+                when asset = 'BTC' then format('%.5f', value / price_aud)
+                else format('%,d', value / price_aud)
+              end as '<strong>Amount</strong>',
+              format('$%,d', value) as '<strong>Value</strong>',
+              format('%.1f %%', target * 100) as '<strong>Target</strong>',
+              format('%.1f %%', actual * 100) as '<strong>Actual</strong>',
+              format('%.1f %%', change * 100) as '<strong>Change</strong>',
+              case
+                -- No actions for cash.
+                when asset = 'Cash' then ''
+                when change > 0 then format(
+                  '<span style="color: limegreen">Buy</span> %s %s @ $%,d',
+                  iif(
+                    asset = 'BTC',
+                    format('%.5f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+                else format(
+                  '<span style="color: red">Sell</span> %s %s @ $%,d',
+                  iif(
+                    asset = 'BTC',
+                    format('%.5f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+              end as '<strong>Action</strong>'
             from
-              normalised_balance_aud
-              join target_allocation on normalised_balance_aud.asset = target_allocation.asset
-            where
-              account not like 'Liabilities:StateCustodians:%'
-            group by
-              date,
-              normalised_balance_aud.Asset
-          library: vega-lite
-          display:
-            mark:
-              type: area
-              opacity: 0.85
-            encoding:
-              x:
-                timeUnit: yearmonthdate
-                field: date
-                title: Date
-              y:
-                aggregate: sum
-                field: value
-                title: Value
-                axis:
-                  labelExpr: "'$'+datum.label"
-              color:
-                field: Asset
-                scale:
-                  scheme: pastel1
-                sort:
-                  field: rank
-                  order: descending
-              order:
-                field: rank
+              change
+            order by
+              abs(change) desc
+          library: table
         total:
           title: Total value
           db: portfolio
@@ -104,54 +113,45 @@ plugins:
                     format: .1%
                   color:
                     value: black
-        steps:
-          title: Summary
+        value:
+          title: Asset value over time
           db: portfolio
           query: |
             select
-              format('<strong>%s</strong>', asset) as '',
-              case
-                when asset = 'BTC' then format('%.5f', value / price_aud)
-                else format('%,d', value / price_aud)
-              end as '<strong>Amount</strong>',
-              format('$%,d', value) as '<strong>Value</strong>',
-              format('%.1f %%', target * 100) as '<strong>Target</strong>',
-              format('%.1f %%', actual * 100) as '<strong>Actual</strong>',
-              format('%.1f %%', change * 100) as '<strong>Change</strong>',
-              case
-                -- No actions for cash.
-                when asset = 'Cash' then ''
-                when change > 0 then format(
-                  '<span style="color: limegreen">Buy</span> %s %s @ $%,d',
-                  iif(
-                    asset = 'BTC',
-                    format('%.5f', abs(change_amount)),
-                    format('%.0f', abs(change_amount))
-                  ),
-                  asset,
-                  iif(
-                    asset = 'BTC',
-                    abs(round(change_amount, 5) * price_aud),
-                    abs(round(change_amount) * price_aud)
-                  )
-                )
-                else format(
-                  '<span style="color: red">Sell</span> %s %s @ $%,d',
-                  iif(
-                    asset = 'BTC',
-                    format('%.5f', abs(change_amount)),
-                    format('%.0f', abs(change_amount))
-                  ),
-                  asset,
-                  iif(
-                    asset = 'BTC',
-                    abs(round(change_amount, 5) * price_aud),
-                    abs(round(change_amount) * price_aud)
-                  )
-                )
-              end as '<strong>Action</strong>'
+              date,
+              normalised_balance_aud.asset as Asset,
+              round(sum(value_number)) as value,
+              target_allocation.rowid as rank
             from
-              change
-            order by
-              abs(change) desc
-          library: table
+              normalised_balance_aud
+              join target_allocation on normalised_balance_aud.asset = target_allocation.asset
+            where
+              account not like 'Liabilities:StateCustodians:%'
+            group by
+              date,
+              normalised_balance_aud.Asset
+          library: vega-lite
+          display:
+            mark:
+              type: area
+              opacity: 0.85
+            encoding:
+              x:
+                timeUnit: yearmonthdate
+                field: date
+                title: Date
+              y:
+                aggregate: sum
+                field: value
+                title: Value
+                axis:
+                  labelExpr: "'$'+datum.label"
+              color:
+                field: Asset
+                scale:
+                  scheme: pastel1
+                sort:
+                  field: rank
+                  order: descending
+              order:
+                field: rank

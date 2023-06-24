@@ -8,7 +8,7 @@ Create SQLite database from portfolio locally:
     # Convert portfolio Beancount ledger to SQLite.
     bean-sql ../portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db
     # Create target allocations table.
-    sqlite3 portfolio/cdk/function/portfolio.db < ../portfolio-ledger/target_allocations.sql
+    sqlite3 portfolio/cdk/function/portfolio.db < ../portfolio-ledger/target_allocation.sql
     # Initialise database with views.
     sqlite3 portfolio/cdk/function/portfolio.db < views.sql
 

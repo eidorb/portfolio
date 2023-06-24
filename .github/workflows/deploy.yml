@@ -63,7 +63,7 @@ jobs:
           bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db 2>/dev/null
 
           # Create target allocations table.
-          sqlite3 portfolio/cdk/function/portfolio.db < portfolio-ledger/target_allocations.sql
+          sqlite3 portfolio/cdk/function/portfolio.db < portfolio-ledger/target_allocation.sql
 
           # Initialise database with views.
           sqlite3 portfolio/cdk/function/portfolio.db < views.sql

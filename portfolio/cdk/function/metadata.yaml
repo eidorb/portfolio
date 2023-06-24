@@ -56,9 +56,9 @@ plugins:
           display:
             field: total
         change:
-          title: Percentage change required to reach target allocations
+          title: Change required to reach target
           db: portfolio
-          query: select * from changes order by change desc
+          query: select * from change order by change desc
           library: vega-lite
           display:
             encoding:
@@ -68,7 +68,7 @@ plugins:
                 stack: null
                 axis: null
               y:
-                field: asset_class
+                field: asset
                 type: nominal
                 sort: null
                 axis: null
@@ -87,7 +87,7 @@ plugins:
                     expr: datum.change>0?-4:4
                 encoding:
                   text:
-                    field: asset_class
+                    field: asset
                   color:
                     value: black
                   x:

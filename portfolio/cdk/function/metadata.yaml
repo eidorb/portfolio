@@ -105,17 +105,53 @@ plugins:
                   color:
                     value: black
         steps:
-          title: Steps to rebalance
+          title: Summary
           db: portfolio
           query: |
             select
+              format('<strong>%s</strong>', asset) as '',
               case
-                when action == 'Buy' then '<span style="color: limegreen">Buy</span>'
-                else '<span style="color: red">Sell</span>'
-              end as '<strong>Action</strong>',
-              printf('%s %s', amount, asset) as '<strong>Asset</strong>',
-              amount_aud as '<strong>Value (AUD)</strong>',
-              portfolio_percentage as '<strong>Percentage of portfolio</strong>'
+                when asset = 'BTC' then format('%.5f', value / price_aud)
+                else format('%,d', value / price_aud)
+              end as '<strong>Amount</strong>',
+              format('$%,d', value) as '<strong>Value</strong>',
+              format('%.1f %%', target * 100) as '<strong>Target</strong>',
+              format('%.1f %%', actual * 100) as '<strong>Actual</strong>',
+              format('%.1f %%', change * 100) as '<strong>Change</strong>',
+              case
+                -- No actions for cash.
+                when asset = 'Cash' then ''
+                when change > 0 then format(
+                  '<span style="color: limegreen">Buy</span> %s %s @ $%,d',
+                  iif(
+                    asset = 'BTC',
+                    format('%.5f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+                else format(
+                  '<span style="color: red">Sell</span> %s %s @ $%,d',
+                  iif(
+                    asset = 'BTC',
+                    format('%.5f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+              end as '<strong>Action</strong>'
             from
-              actions
+              change
+            order by
+              abs(change) desc
           library: table

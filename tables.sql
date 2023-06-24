@@ -104,8 +104,7 @@ with asset as (
     date,
     latest_balance.asset,
     price_aud,
-    sum(value_number) as value,
-    sum(value_number) over() as total
+    sum(value_number) as value
   from
     latest_balance
   where
@@ -113,10 +112,15 @@ with asset as (
     account not like 'Liabilities:StateCustodians:%'
   group by
     latest_balance.asset
+),
+total as (
+  select sum(value) as total
+  from asset
 )
 select
   asset.*,
   target,
+  total,
   target * total as target_value,
   value / total as actual,
   target - value / total as change,
@@ -124,4 +128,5 @@ select
   (target * total - value) / price_aud as change_amount
 from
   asset
-  join target_allocation on asset.asset = target_allocation.asset;
+  join target_allocation on asset.asset = target_allocation.asset
+  join total;

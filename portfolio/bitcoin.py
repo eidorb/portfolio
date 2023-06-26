@@ -22,7 +22,7 @@ def get_balance(api_key: str, addresses: str, account: str) -> typing.NamedTuple
         headers={"Authorization": f"Bearer {api_key}"},
     )
     return Balance(
-        meta=dict(time=now.isoformat()),
+        meta={},
         date=now.date(),
         account=account,
         amount=Amount(

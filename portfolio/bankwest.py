@@ -39,7 +39,7 @@ def get_balance(
     account_name = "".join(word.title() for word in account["AccountNickName"].split())
 
     return Balance(
-        meta=dict(time=now.isoformat()),
+        meta={},
         date=now.date(),
         account=f"""{account_prefix}{account_name}""",
         amount=Amount(D(str(account["AccountCurrentBalance"])), "AUD"),

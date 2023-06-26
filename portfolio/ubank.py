@@ -101,7 +101,7 @@ def get_balances(
 
     return [
         Balance(
-            meta=dict(time=now.isoformat()),
+            meta={},
             date=now.date(),
             account=f"{account_prefix}{account['productName']}",
             amount=Amount(D(account["availableBalance"]), "AUD"),

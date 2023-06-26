@@ -37,7 +37,7 @@ def get_balances(token: str, account_prefix="Assets:Up:") -> list[typing.NamedTu
     )
     return [
         Balance(
-            meta=dict(time=now.isoformat()),
+            meta={},
             date=now.date(),
             account=f"{account_prefix}{account['attributes']['displayName']}",
             amount=Amount(

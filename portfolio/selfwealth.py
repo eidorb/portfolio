@@ -101,7 +101,7 @@ def get_balances(
             code = "USD"
         balances.append(
             Balance(
-                meta=dict(time=now.isoformat()),
+                meta={},
                 date=now.date(),
                 account=f"{account_prefix}{code}",
                 amount=Amount(

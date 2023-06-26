@@ -44,7 +44,7 @@ def convert_portions(
         else:
             account = f"Liabilities:StateCustodians:{portion.id}"
         balance = Balance(  # type: ignore
-            meta=dict(time=datetime.isoformat()),
+            meta={},
             date=datetime.date(),
             account=account,
             amount=Amount(

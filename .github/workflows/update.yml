@@ -60,7 +60,7 @@ jobs:
           # Update balances and prices in ledger.
           cd portfolio-ledger
           update-balances
-          bean-price --inactive portfolio.beancount >> prices.beancount 2>/dev/null
+          bean-price --inactive --date $(date -I) portfolio.beancount >> prices.beancount 2>/dev/null
 
           # Commit to remote repository.
           git config user.name "GitHub Actions"

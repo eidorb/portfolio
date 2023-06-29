@@ -50,6 +50,20 @@ class PortfolioStack(cdk.Stack):
             retry_attempts=0,
         )
 
+        # Likewise, package the demo Lambda function.
+        demo_python_function = python.PythonFunction(
+            self,
+            "DemoPythonFunction",
+            entry=str(Path(__file__).parent / "demo-function"),
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="handler",
+            index="index.py",
+            log_retention=logs.RetentionDays.ONE_MONTH,
+            memory_size=256,
+            timeout=cdk.Duration.seconds(10),
+            retry_attempts=0,
+        )
+
         # Grant Lambda function execution role permission to read parameters.
         for index, parameter_name in enumerate(
             (
@@ -71,11 +85,19 @@ class PortfolioStack(cdk.Stack):
         )
 
         domain_name = "portfolio.brodie.id.au"
+        demo_domain_name = "portfolio-demo.brodie.id.au"
 
+        # Create certificates.
         certificate = acm.Certificate(
             self,
             "Certificate",
             domain_name=domain_name,
+            validation=acm.CertificateValidation.from_dns(hosted_zone),
+        )
+        demo_certificate = acm.Certificate(
+            self,
+            "DemoCertificate",
+            domain_name=demo_domain_name,
             validation=acm.CertificateValidation.from_dns(hosted_zone),
         )
 
@@ -104,6 +126,31 @@ class PortfolioStack(cdk.Stack):
             price_class=cloudfront.PriceClass.PRICE_CLASS_100,
         )
 
+        # Do the same for the demo distribution.
+        demo_distribution = cloudfront.Distribution(
+            self,
+            "DemoDistribution",
+            default_behavior=cloudfront.BehaviorOptions(
+                # Disable CloudFront caching.
+                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+                # Forward everything from the viewer request to Lambda@Edge function.
+                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
+                edge_lambdas=[
+                    cloudfront.EdgeLambda(
+                        event_type=cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
+                        function_version=demo_python_function.current_version,
+                        include_body=True,
+                    )
+                ],
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                # Use a placeholder domain name because origin will never be fetched.
+                origin=origins.HttpOrigin(domain_name="example.com"),
+            ),
+            certificate=demo_certificate,
+            domain_names=[demo_domain_name],
+            price_class=cloudfront.PriceClass.PRICE_CLASS_100,
+        )
+
         # Create an alias record for the CloudFront distribution.
         route53.ARecord(
             scope=self,
@@ -113,6 +160,17 @@ class PortfolioStack(cdk.Stack):
             ),
             zone=hosted_zone,
             record_name=domain_name,
+        )
+
+        # Create an alias record for the demo CloudFront distribution.
+        route53.ARecord(
+            scope=self,
+            id="DemoAlias",
+            target=route53.RecordTarget.from_alias(
+                route53_targets.CloudFrontTarget(demo_distribution)
+            ),
+            zone=hosted_zone,
+            record_name=demo_domain_name,
         )
 
 

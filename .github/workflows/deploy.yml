@@ -71,6 +71,12 @@ jobs:
           # Precalculate table counts for immutable mode.
           datasette inspect portfolio/cdk/function/portfolio.db --inspect-file=portfolio/cdk/function/inspect_data.json
 
+          # Do the same for demo data.
+          bean-sql portfolio/cdk/demo-function/demo-portfolio.beancount portfolio/cdk/demo-function/portfolio.db 2>/dev/null
+          sqlite3 portfolio/cdk/demo-function/portfolio.db < portfolio-ledger/target_allocation.sql
+          sqlite3 portfolio/cdk/demo-function/portfolio.db < tables.sql
+          datasette inspect portfolio/cdk/demo-function/portfolio.db --inspect-file=portfolio/cdk/demo-function/inspect_data.json
+
           # Install Node.js package dependencies.
           npm ci
 

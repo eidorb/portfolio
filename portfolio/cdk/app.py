@@ -104,10 +104,14 @@ class PortfolioStack(cdk.Stack):
             self,
             "Distribution",
             default_behavior=cloudfront.BehaviorOptions(
-                # Disable CloudFront caching.
-                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
-                # Forward everything from the viewer request to Lambda@Edge function.
-                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
+                # Include all query strings and cookies (auth) in cache key; default
+                # cache settings otherwise.
+                cache_policy=cloudfront.CachePolicy(
+                    scope=self,
+                    id="CachePolicy",
+                    cookie_behavior=cloudfront.CacheCookieBehavior.all(),
+                    query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
+                ),
                 edge_lambdas=[
                     cloudfront.EdgeLambda(
                         event_type=cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
@@ -129,10 +133,12 @@ class PortfolioStack(cdk.Stack):
             self,
             "DemoDistribution",
             default_behavior=cloudfront.BehaviorOptions(
-                # Disable CloudFront caching.
-                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
-                # Forward everything from the viewer request to Lambda@Edge function.
-                origin_request_policy=cloudfront.OriginRequestPolicy.ALL_VIEWER,
+                # Include all query strings in cache key, but maximal cache otherwise.
+                cache_policy=cloudfront.CachePolicy(
+                    scope=self,
+                    id="DemoCachePolicy",
+                    query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
+                ),
                 edge_lambdas=[
                     cloudfront.EdgeLambda(
                         event_type=cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,

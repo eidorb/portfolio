@@ -59,8 +59,6 @@ class PortfolioStack(cdk.Stack):
             handler="handler",
             index="index.py",
             log_retention=logs.RetentionDays.ONE_MONTH,
-            memory_size=256,
-            timeout=cdk.Duration.seconds(10),
             retry_attempts=0,
         )
 

@@ -101,6 +101,7 @@ class PortfolioStack(cdk.Stack):
             ),
             certificate=certificate,
             domain_names=[domain_name],
+            price_class=cloudfront.PriceClass.PRICE_CLASS_100,
         )
 
         # Create an alias record for the CloudFront distribution.

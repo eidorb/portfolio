@@ -110,6 +110,7 @@ class PortfolioStack(cdk.Stack):
                     scope=self,
                     id="CachePolicy",
                     cookie_behavior=cloudfront.CacheCookieBehavior.all(),
+                    header_behavior=cloudfront.CacheHeaderBehavior.allow_list("Host"),
                     query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
                 ),
                 edge_lambdas=[
@@ -137,6 +138,7 @@ class PortfolioStack(cdk.Stack):
                 cache_policy=cloudfront.CachePolicy(
                     scope=self,
                     id="DemoCachePolicy",
+                    header_behavior=cloudfront.CacheHeaderBehavior.allow_list("Host"),
                     query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
                 ),
                 edge_lambdas=[

@@ -48,4 +48,5 @@ def get_balances(token: str, account_prefix="Assets:Up:") -> list[typing.NamedTu
             diff_amount=None,
         )  # type: ignore
         for account in response.json()["data"]
+        if account["attributes"]["accountType"] == "TRANSACTIONAL"
     ]

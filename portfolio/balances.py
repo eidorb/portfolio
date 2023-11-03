@@ -3,7 +3,7 @@ import logging
 from beancount.parser import printer
 import pyotp
 
-from . import bankwest, bitcoin, secrets, selfwealth, statecustodians, up
+from . import bankwest, bitcoin, secrets, selfwealth, up
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,6 @@ def update(filename="balances.beancount") -> None:
                 email=secrets.selfwealth.email,
                 password=secrets.selfwealth.password,
                 otp=pyotp.TOTP(secrets.selfwealth.totp_key).now(),
-            ),
-        ),
-        (
-            "State Custodians",
-            lambda: statecustodians.get_balances(
-                user_id=secrets.statecustodians.user_id,
-                password=secrets.statecustodians.password,
             ),
         ),
         (

@@ -60,22 +60,22 @@ jobs:
           echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
 
           # Convert portfolio Beancount ledger to SQLite.
-          bean-sql portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db 2>/dev/null
+          bean-sql portfolio-ledger/portfolio.beancount cdk/function/portfolio.db 2>/dev/null
 
           # Create target allocation table.
-          sqlite3 portfolio/cdk/function/portfolio.db < portfolio-ledger/target_allocation.sql
+          sqlite3 cdk/function/portfolio.db < portfolio-ledger/target_allocation.sql
 
           # Create additional tables.
-          sqlite3 portfolio/cdk/function/portfolio.db < tables.sql
+          sqlite3 cdk/function/portfolio.db < tables.sql
 
           # Precalculate table counts for immutable mode.
-          datasette inspect portfolio/cdk/function/portfolio.db --inspect-file=portfolio/cdk/function/inspect_data.json
+          datasette inspect cdk/function/portfolio.db --inspect-file=cdk/function/inspect_data.json
 
           # Do the same for demo data.
-          bean-sql portfolio/cdk/demo-function/demo-portfolio.beancount portfolio/cdk/demo-function/portfolio.db 2>/dev/null
-          sqlite3 portfolio/cdk/demo-function/portfolio.db < portfolio-ledger/target_allocation.sql
-          sqlite3 portfolio/cdk/demo-function/portfolio.db < tables.sql
-          datasette inspect portfolio/cdk/demo-function/portfolio.db --inspect-file=portfolio/cdk/demo-function/inspect_data.json
+          bean-sql cdk/demo-function/demo-portfolio.beancount cdk/demo-function/portfolio.db 2>/dev/null
+          sqlite3 cdk/demo-function/portfolio.db < portfolio-ledger/target_allocation.sql
+          sqlite3 cdk/demo-function/portfolio.db < tables.sql
+          datasette inspect cdk/demo-function/portfolio.db --inspect-file=cdk/demo-function/inspect_data.json
 
           # Install Node.js package dependencies.
           npm ci

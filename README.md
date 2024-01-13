@@ -6,15 +6,15 @@ Create SQLite database from portfolio locally:
 
     micromamba activate portfolio
     # Convert portfolio Beancount ledger to SQLite.
-    bean-sql ../portfolio-ledger/portfolio.beancount portfolio/cdk/function/portfolio.db
+    bean-sql ../portfolio-ledger/portfolio.beancount cdk/function/portfolio.db
     # Create target allocation table.
-    sqlite3 portfolio/cdk/function/portfolio.db < ../portfolio-ledger/target_allocation.sql
+    sqlite3 cdk/function/portfolio.db < ../portfolio-ledger/target_allocation.sql
     # Create additional tables.
-    sqlite3 portfolio/cdk/function/portfolio.db < tables.sql
+    sqlite3 cdk/function/portfolio.db < tables.sql
 
 Serve Datasette locally:
 
-    datasette portfolio/cdk/function/portfolio.db --reload --metadata portfolio/cdk/function/metadata.yaml
+    datasette cdk/function/portfolio.db --reload --metadata cdk/function/metadata.yaml
 
 
 # Auth
@@ -61,7 +61,7 @@ poetry update
 ## Upgrade Lambda function dependencies
 
 ```bash
-cd portfolio/cdk/function
+cd cdk/function
 poetry update
 cd -
 ```

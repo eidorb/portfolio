@@ -39,7 +39,7 @@ jobs:
           ./bin/micromamba shell hook > ~/.bashrc
 
           # Install Poetry.
-          curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL https://install.python-poetry.org | python3 - --version 1.7.1
 
           # Create Mamba environment.
           source ~/.bashrc

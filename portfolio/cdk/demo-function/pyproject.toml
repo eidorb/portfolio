@@ -10,7 +10,7 @@ mangum = "^0.17.0"
 datasette = "^0.64.2"
 datasette-auth-github = "^0.13.1"
 datasette-redirect-forbidden = "^0.1"
-datasette-dashboards = "^0.5.1"
+datasette-dashboards = "^0.6.2"
 datasette-hashed-urls = "^0.4"
 sqlean-py = "^0.21.8.5"
 

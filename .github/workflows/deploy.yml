@@ -56,9 +56,6 @@ jobs:
           source ~/.bashrc
           micromamba activate portfolio
 
-          # Unlock git-crypt.
-          echo $GIT_CRYPT_KEY | base64 -d | git-crypt unlock -
-
           # Convert portfolio Beancount ledger to SQLite.
           bean-sql portfolio-ledger/portfolio.beancount cdk/function/portfolio.db 2>/dev/null
 
@@ -90,5 +87,3 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id $(jq --raw-output '.Portfolio.PortfolioDistributionId' < outputs.json) \
             --paths "/*"
-        env:
-          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

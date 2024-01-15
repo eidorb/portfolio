@@ -83,7 +83,12 @@ jobs:
           # Show CDK stack diff.
           npx cdk diff
 
-          # Deploy CDK stack.
-          npx cdk deploy --require-approval never Portfolio
+          # Deploy CDK stack, writing CloudFormation outputs to file.
+          npx cdk deploy --require-approval never Portfolio --outputs-file outputs.json
+
+          # Invalidate CloudFront cache.
+          aws cloudfront create-invalidation \
+            --distribution-id $(jq --raw-output '.Portfolio.PortfolioDistributionId' < outputs.json) \
+            --paths "/*"
         env:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

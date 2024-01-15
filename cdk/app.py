@@ -5,6 +5,7 @@ import aws_cdk as cdk
 import aws_cdk.aws_certificatemanager as acm
 import aws_cdk.aws_cloudfront as cloudfront
 import aws_cdk.aws_cloudfront_origins as origins
+import aws_cdk.aws_iam as iam
 import aws_cdk.aws_lambda as lambda_
 import aws_cdk.aws_lambda_python_alpha as python
 import aws_cdk.aws_logs as logs
@@ -175,6 +176,20 @@ class PortfolioStack(cdk.Stack):
             ),
             zone=hosted_zone,
             record_name=demo_domain_name,
+        )
+
+        # Grant GithubOidcRole permission to create cache invalidation.
+        distribution.grant_create_invalidation(
+            iam.Role.from_role_arn(
+                scope=self,
+                id="GithubOidcRole",
+                role_arn="arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2",
+            )
+        )
+
+        # Output CloudFront distribution ID.
+        cdk.CfnOutput(
+            scope=self, id="PortfolioDistributionId", value=distribution.distribution_id
         )
 
 

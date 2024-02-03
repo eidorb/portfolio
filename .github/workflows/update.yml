@@ -45,8 +45,8 @@ jobs:
           # Install Python package dependencies.
           poetry install
 
-          # Install Chromium for Playwright.
-          python -m playwright install chromium
+          # Install Firefox for Playwright.
+          python -m playwright install --with-deps firefox
       - run: |
           source ~/.bashrc
           micromamba activate portfolio

@@ -1,9 +1,9 @@
 import logging
 
-from beancount.parser import printer
 import pyotp
+from beancount.parser import printer
 
-from . import bankwest, bitcoin, secrets, selfwealth, up
+from . import bankwest, bitcoin, secrets, selfwealth, ubank, up
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,14 @@ def update(filename="balances.beancount") -> None:
                     password=secrets.bankwest.password,
                 )
             ],
+        ),
+        (
+            "Ubank",
+            lambda: ubank.get_balances(
+                username=secrets.ubank.username,
+                password=secrets.ubank.password,
+                cookie=secrets.ubank.cookie,
+            ),
         ),
     ):
         # Open ledger file in append mode.

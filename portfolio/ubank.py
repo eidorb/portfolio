@@ -22,7 +22,7 @@ def get_balances(
     now = queensland_now()
 
     # Log in to ubank.
-    ubank_client = UbankClient(headless=False)
+    ubank_client = UbankClient()
     ubank_client.log_in_with_trusted_cookie(username, password, cookie)
 
     # Get account balances.

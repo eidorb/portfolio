@@ -96,3 +96,8 @@ cd -
 - Install Python dependencies:
 
       micromamba run --name portfolio poetry install
+
+
+## Github Actions secrets
+
+- `TAILSCALE_AUTHKEY`: Ephemeral Tailscale authkey. Must be rotated every 90 days.

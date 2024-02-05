@@ -57,10 +57,17 @@ jobs:
           # Configure time zone so that fetched prices have the correct date.
           sudo timedatectl set-timezone Australia/Queensland
 
+          # Configure Tailscale to use valery as exit node.
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up --authkey ${TAILSCALE_AUTHKEY} --hostname "github-actions-network-$(cat /etc/hostname)"
+          sudo tailscale up --authkey ${TAILSCALE_AUTHKEY} --exit-node valery --hostname "github-actions-network-$(cat /etc/hostname)"
+
           # Update balances and prices in ledger.
           cd portfolio-ledger
           update-balances
           bean-price --inactive --date $(date -I) portfolio.beancount >> prices.beancount 2>/dev/null
+
+          sudo tailscale logout
 
           # Commit to remote repository.
           git config user.name "GitHub Actions"
@@ -72,3 +79,4 @@ jobs:
           git push
         env:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}

@@ -22,7 +22,6 @@ def otp():
     return SecretString(pyotp.TOTP(secrets.selfwealth.totp_key).now())
 
 
-@pytest.mark.skip(reason="SelfWealth access doesn't work from GitHub Actions")
 def test_get_balances(email, password, otp):
     """Tests Balance directive is returned with expected currency code."""
     balances = selfwealth.get_balances(email, password, otp)

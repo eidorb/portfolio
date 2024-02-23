@@ -1544,13 +1544,13 @@ files = [
 
 [[package]]
 name = "ubank"
-version = "0.1.1"
+version = "0.1.2"
 description = "Access ubank programatically."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "ubank-0.1.1-py3-none-any.whl", hash = "sha256:8ac933f3f85ff02ea201e4e9e2f585d11f2b2a809d5a5da70476be68291039c7"},
-    {file = "ubank-0.1.1.tar.gz", hash = "sha256:c9692964c5ac665eeca24f174871118af8df0011cad2aa53caf807d5a2e876de"},
+    {file = "ubank-0.1.2-py3-none-any.whl", hash = "sha256:7ae553ca55205f0067218fa2c165184d26704364559b519d5632b58985e56556"},
+    {file = "ubank-0.1.2.tar.gz", hash = "sha256:2dc3e24d808f8abcac746778fda1c1b2a0037acd95eecadce9d7e3d0819073eb"},
 ]
 
 [package.dependencies]
@@ -1604,4 +1604,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "ae55c21e314157092d25543611bbd5c2d8241972c2f7e37243499d467a189c1a"
+content-hash = "842fc9c42faaa1ac8967a6f155dc9765257a88c1a99b3f0119aa25dfde6b8225"

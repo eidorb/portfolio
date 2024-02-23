@@ -21,15 +21,10 @@ def get_balances(
     """
     now = queensland_now()
 
-    # Log in to ubank.
-    ubank_client = UbankClient()
-    ubank_client.log_in_with_trusted_cookie(username, password, cookie)
-
-    # Get account balances.
-    accounts = ubank_client.get_accounts()
-    ubank_client.context.close()
-    ubank_client.browser.close()
-    ubank_client.playwright.stop()
+    # Get ubank eaccount balances.
+    with UbankClient() as ubank_client:
+        ubank_client.log_in_with_trusted_cookie(username, password, cookie)
+        accounts = ubank_client.get_accounts()
 
     # The accounts object has the following structure:
     # {

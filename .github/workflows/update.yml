@@ -4,6 +4,11 @@ on:
   # more interesting than the same day every week.
   schedule:
     - cron: "0 0 1,6,11,16,21,26 * *"
+  workflow_dispatch:
+# Grant workflow permissions to write to this (portfolio) repository. This allows
+# updated secrets to be commited if necessary.
+permissions:
+  contents: write
 jobs:
   update-portfolio:
     runs-on: ubuntu-latest
@@ -12,8 +17,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: eidorb/portfolio-ledger
-          token: ${{ secrets.TOKEN }}
           path: portfolio-ledger
+          # Use personal access token that grants permissions to write to portfolio-ledger repository.
+          token: ${{ secrets.TOKEN }}
       - id: cache
         uses: actions/cache@v3
         with:
@@ -69,13 +75,20 @@ jobs:
 
           sudo tailscale logout
 
-          # Commit to remote repository.
-          git config user.name "GitHub Actions"
-          git config user.email "$GITHUB_JOB@$GITHUB_REPOSITORY"
+          # Commit changes to portfolio-ledger repository.
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "$GITHUB_JOB@$GITHUB_REPOSITORY"
           git add balances.beancount
           git add prices.beancount
           git status
           git commit -m "Update portfolio from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git push
+
+          # Commit updated secrets to portfolio repository.
+          cd ..
+          git add portfolio/secrets.py
+          git status
+          git commit -m "Update secrets from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           git push
         env:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

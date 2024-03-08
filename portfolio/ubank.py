@@ -97,7 +97,7 @@ def get_balances_and_cookie(
                 meta={},
                 date=now.date(),
                 account=f"{account_prefix}{account['metadata']['ubankOne']['productName']}",
-                amount=Amount(D(account["balance"]["available"]), "AUD"),
+                amount=Amount(D(str(account["balance"]["available"])), "AUD"),
                 tolerance=None,
                 diff_amount=None,
             )  # type: ignore

@@ -101,3 +101,38 @@ cd -
 ## Github Actions secrets
 
 - `TAILSCALE_AUTHKEY`: Ephemeral Tailscale authkey. Must be rotated every 90 days.
+
+
+## Embedding a dashboard in the index page
+
+Portfolio information is summarised in dashboard charts using the [datasette-dashboards](https://datasette.io/plugins/datasette-dashboards) plugin.
+This information should be visible on the index page, rather than having to navigate to the dashboard page.
+
+datasette-dashboards documentation suggests using `<iframe>` elements to embed dashboards and charts in HTML.
+However, it was difficult to achieve a responsive layout without scrollbars using this approach.
+Instead, a subset of elements from the dashboard page are included in the index page's HTML.
+Datasette's index page is customised using the `description_html` [metadata](https://docs.datasette.io/en/stable/metadata.html) property.
+
+The [Datasette CLI](https://docs.datasette.io/en/stable/cli-reference.html#datasette-get) and `extract-dashboard.py` script is used to extract HTML elements from the dashboard page.
+
+The following command extracts dashboard HTML elements to the clipboard for easy pasting into `metadata.yaml`:
+
+```bash
+datasette serve \
+  --get https://portfolio.brodie.id.au/-/dashboards/portfolio \
+  --metadata cdk/function/metadata.yaml \
+  cdk/function/portfolio.db | \
+python extract-dashboard.py | \
+pbcopy
+```
+
+This command does the same for the demo application:
+
+```bash
+datasette serve \
+  --get https://portfolio-demo.brodie.id.au/-/dashboards/portfolio \
+  --metadata cdk/function/metadata.yaml \
+  cdk/function/portfolio.db | \
+python extract-dashboard.py | \
+pbcopy
+```

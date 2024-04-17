@@ -157,56 +157,6 @@ plugins:
       title: Portfolio
       filters: {}
       charts:
-        summary:
-          title: Summary
-          db: portfolio
-          query: |
-            select
-              format('%s', asset) as 'Asset',
-              case
-                when asset = 'BTC' then format('%.5f', value / price_aud)
-                else format('%,d', value / price_aud)
-              end as 'Amount',
-              format('%.1f %%', target * 100) as 'Target',
-              format('%.1f %% ($%,d)', actual * 100, value) as 'Actual',
-              format('%.1f %% ($%,d)', change * 100, change_value) as 'Change required',
-              case
-                -- No actions for cash.
-                when asset = 'Cash' then ''
-                when change > 0 then format(
-                  '<span style="color: limegreen">Buy</span> %s %s',
-                  iif(
-                    asset = 'BTC',
-                    format('%.5f', abs(change_amount)),
-                    format('%.0f', abs(change_amount))
-                  ),
-                  asset,
-                  iif(
-                    asset = 'BTC',
-                    abs(round(change_amount, 5) * price_aud),
-                    abs(round(change_amount) * price_aud)
-                  )
-                )
-                else format(
-                  '<span style="color: red">Sell</span> %s %s',
-                  iif(
-                    asset = 'BTC',
-                    format('%.5f', abs(change_amount)),
-                    format('%.0f', abs(change_amount))
-                  ),
-                  asset,
-                  iif(
-                    asset = 'BTC',
-                    abs(round(change_amount, 5) * price_aud),
-                    abs(round(change_amount) * price_aud)
-                  )
-                )
-              end as 'Action'
-            from
-              change
-            order by
-              abs(change) desc
-          library: table
         total:
           title: Total value
           db: portfolio
@@ -215,7 +165,7 @@ plugins:
           display:
             field: total
         change:
-          title: Change required to rebalance
+          title: Change required to reach target allocation
           db: portfolio
           query: select * from change order by change desc
           library: vega-lite
@@ -263,6 +213,56 @@ plugins:
                     format: .1%
                   color:
                     value: black
+        rebalance:
+          title: Actions required to rebalance
+          db: portfolio
+          query: |
+            select
+              format('%s', asset) as 'Asset',
+              case
+                when asset = 'BTC' then format('%.4f', value / price_aud)
+                else format('%,d', value / price_aud)
+              end as 'Amount',
+              format('%.0f %%', target * 100) as 'Target',
+              format('%.1f %% ($%,d)', actual * 100, value) as 'Actual',
+              format('%.1f %% ($%,d)', change * 100, change_value) as 'Change required',
+              case
+                -- No actions for cash.
+                when asset = 'Cash' then ''
+                when change > 0 then format(
+                  '<span style="color: limegreen">Buy</span> %s %s',
+                  iif(
+                    asset = 'BTC',
+                    format('%.4f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+                else format(
+                  '<span style="color: red">Sell</span> %s %s',
+                  iif(
+                    asset = 'BTC',
+                    format('%.4f', abs(change_amount)),
+                    format('%.0f', abs(change_amount))
+                  ),
+                  asset,
+                  iif(
+                    asset = 'BTC',
+                    abs(round(change_amount, 5) * price_aud),
+                    abs(round(change_amount) * price_aud)
+                  )
+                )
+              end as 'Action'
+            from
+              change
+            order by
+              abs(change) desc
+          library: table
         value:
           title: Asset value over time
           db: portfolio

@@ -1,4 +1,5 @@
 """Portfolio AWS CDK app."""
+
 from pathlib import Path
 
 import aws_cdk as cdk
@@ -179,17 +180,20 @@ class PortfolioStack(cdk.Stack):
         )
 
         # Grant GithubOidcRole permission to create cache invalidation.
-        distribution.grant_create_invalidation(
-            iam.Role.from_role_arn(
-                scope=self,
-                id="GithubOidcRole",
-                role_arn="arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2",
-            )
+        github_oidc_role = iam.Role.from_role_arn(
+            scope=self,
+            id="GithubOidcRole",
+            role_arn="arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2",
         )
+        distribution.grant_create_invalidation(github_oidc_role)
+        demo_distribution.grant_create_invalidation(github_oidc_role)
 
-        # Output CloudFront distribution ID.
+        # Output CloudFront distribution IDs.
         cdk.CfnOutput(
-            scope=self, id="PortfolioDistributionId", value=distribution.distribution_id
+            scope=self, id="DistributionId", value=distribution.distribution_id
+        )
+        cdk.CfnOutput(
+            scope=self, id="DemoDistributionId", value=demo_distribution.distribution_id
         )
 
 

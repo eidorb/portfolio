@@ -83,7 +83,10 @@ jobs:
           # Deploy CDK stack, writing CloudFormation outputs to file.
           npx cdk deploy --require-approval never Portfolio --outputs-file outputs.json
 
-          # Invalidate CloudFront cache.
+          # Invalidate CloudFront caches.
           aws cloudfront create-invalidation \
-            --distribution-id $(jq --raw-output '.Portfolio.PortfolioDistributionId' < outputs.json) \
+            --distribution-id $(jq --raw-output '.Portfolio.DistributionId' < outputs.json) \
+            --paths "/*"
+          aws cloudfront create-invalidation \
+            --distribution-id $(jq --raw-output '.Portfolio.DemoDistributionId' < outputs.json) \
             --paths "/*"

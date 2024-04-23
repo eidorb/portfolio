@@ -47,6 +47,7 @@ class PortfolioStack(cdk.Stack):
             handler="handler",
             index="index.py",
             log_retention=logs.RetentionDays.ONE_MONTH,
+            memory_size=1024,
             retry_attempts=0,
         )
 
@@ -59,6 +60,7 @@ class PortfolioStack(cdk.Stack):
             handler="handler",
             index="index.py",
             log_retention=logs.RetentionDays.ONE_MONTH,
+            memory_size=1024,
             retry_attempts=0,
         )
 

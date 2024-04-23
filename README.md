@@ -136,3 +136,10 @@ datasette serve \
 python extract-dashboard.py | \
 pbcopy
 ```
+
+
+## Lambda function performance
+
+Lambda allocates CPU in proportion to the amount of memory configured. Request durations of multiple seconds were observed with the default setting of 128 MB. Occasional timeouts occurred when the default timeout of 3 seconds was exceeded.
+
+Setting memory size to 1024 MB resulted in much shorter durations: 100 ms or less.

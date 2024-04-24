@@ -73,6 +73,9 @@ jobs:
           sqlite3 cdk/demo-function/portfolio.db < portfolio-ledger/target_allocation.sql
           sqlite3 cdk/demo-function/portfolio.db < tables.sql
           cd cdk/demo-function; datasette inspect portfolio.db --inspect-file=inspect_data.json; cd -
+          
+          # Demo function dependencies are identical to the main function.
+          cp cdk/function/pyproject.toml cdk/function/poetry.lock cdk/demo-function
 
           # Install Node.js package dependencies.
           npm ci

@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - master
-  repository_dispatch:
-    types:
-      - portfolio-ledger-push
+  # Allow workflow to be triggered from portfolio-ledger workflow.
+  workflow_dispatch:
 jobs:
   deploy-portfolio:
     runs-on: ubuntu-latest

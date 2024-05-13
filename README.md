@@ -272,7 +272,8 @@ flowchart LR
 #### [test](.github/workflows/test.yml)
 
 Financial institution's websites/APIs are subject to change.
-This workflow runs [pytest tests](tests/) weekly to detect when something has broken.
+This workflow runs [pytest tests](tests/) fortnightly.
+A failed test workflow indicates that something on the financial institution's end has changed and the code needs to be fixed.
 
 
 #### [update](.github/workflows/update.yml)
@@ -280,7 +281,7 @@ This workflow runs [pytest tests](tests/) weekly to detect when something has br
 This workflow updates the Beancount ledger in [portfolio-ledger](https://github.com/eidorb/portfolio-ledger)
 with the latest balances and asset prices.
 
-It is scheduled to run approximately every 5 days.
+It is scheduled to run approximately every 10 days.
 
 
 #### [deploy](.github/workflows/deploy.yml)

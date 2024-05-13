@@ -1,9 +1,10 @@
 name: update
 on:
-  # Schedule a run every 5th day of the month (except the 31st). I think this is
-  # more interesting than the same day every week.
+  # Schedule a run approximately every 10 days of the month. This is more varied
+  # than say the same day each week. Trigger events can be delayed during  times
+  # of high load (e.g., on the hour), so use a random non-zero minute value.
   schedule:
-    - cron: "0 0 1,6,11,16,21,26 * *"
+    - cron: "35 0 1,11,21 * *"
   workflow_dispatch:
 # Grant workflow permissions to write to this (portfolio) repository. This allows
 # updated secrets to be commited if necessary.

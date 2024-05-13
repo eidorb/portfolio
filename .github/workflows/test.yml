@@ -1,8 +1,8 @@
 name: test
 on:
-  # Schedule weekly test run.
+  # Schedule approximately fortnightly test runs.
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "0 0 1,15 * 0"
   # Allow workflow to be run manually.
   workflow_dispatch:
 jobs:

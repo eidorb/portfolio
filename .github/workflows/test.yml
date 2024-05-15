@@ -52,8 +52,8 @@ jobs:
 
           # Configure Tailscale to use valery as exit node.
           curl -fsSL https://tailscale.com/install.sh | sh
-          sudo tailscale up --authkey ${TAILSCALE_AUTHKEY} --hostname "github-actions-network-$(cat /etc/hostname)"
-          sudo tailscale up --authkey ${TAILSCALE_AUTHKEY} --exit-node valery --hostname "github-actions-network-$(cat /etc/hostname)"
+          sudo tailscale up --authkey ${TAILSCALE_AUTHKEY} --hostname "github-actions-network-$(cat /etc/hostname)" --stateful-filtering=false
+          sudo tailscale set --exit-node valery
 
           # Test
           pytest tests

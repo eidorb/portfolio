@@ -330,11 +330,11 @@ workflows connect to a Tailscale network and route traffic via an exit node at h
 
 The following secrets were created in the [repository](https://github.com/eidorb/portfolio/settings/secrets/actions):
 
-| Name                                                                                                | Description                                                                                                                                     |
-| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| [GIT_CRYPT_KEY](https://github.com/eidorb/portfolio/settings/secrets/actions/GIT_CRYPT_KEY)         | Used by [git-crypt](https://www.agwa.name/projects/git-crypt/) to decrypt secret repository files.                                              |
-| [TAILSCALE_AUTHKEY](https://github.com/eidorb/portfolio/settings/secrets/actions/TAILSCALE_AUTHKEY) | Used in the [update](.github/workflows/update.yml) workflow to connect to a [Tailscale network](https://tailscale.com/kb/1111/ephemeral-nodes). |
-| [TOKEN](https://github.com/eidorb/portfolio/settings/secrets/actions/TOKEN)                         | [portfolio-ledger/contents/write](https://github.com/settings/personal-access-tokens/3189407) personal access token.                            |
+| Name                                                                                                                        | Description                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [GIT_CRYPT_KEY](https://github.com/eidorb/portfolio/settings/secrets/actions/GIT_CRYPT_KEY)                                 | Used by [git-crypt](https://www.agwa.name/projects/git-crypt/) to decrypt secret repository files.                    |
+| [TAILSCALE_OAUTH_CLIENT_SECRET](https://github.com/eidorb/portfolio/settings/secrets/actions/TAILSCALE_OAUTH_CLIENT_SECRET) | Used in update and test workflows to connect to a [Tailscale network](https://tailscale.com/kb/1111/ephemeral-nodes). |
+| [TOKEN](https://github.com/eidorb/portfolio/settings/secrets/actions/TOKEN)                                                 | [portfolio-ledger/contents/write](https://github.com/settings/personal-access-tokens/3189407) personal access token.  |
 
 
 ### AWS Parameter Store parameters

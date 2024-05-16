@@ -36,6 +36,7 @@ The project is comprised of several pieces working together:
   - [How to rotate personal access tokens](#how-to-rotate-personal-access-tokens)
     - [portfolio/actions/write](#portfolioactionswrite)
     - [portfolio-ledger/contents/write](#portfolio-ledgercontentswrite)
+  - [How to update ubank trusted cookie](#how-to-update-ubank-trusted-cookie)
 - [Explanation](#explanation)
   - [Storing secrets](#storing-secrets)
   - [Datasette authentication](#datasette-authentication)
@@ -179,8 +180,23 @@ Complete the following steps after an expiry notification is received.
 - Update portfolio's [TOKEN](https://github.com/eidorb/portfolio/settings/secrets/actions/TOKEN) repository secret.
 
 
-## Explanation
+### How to update ubank trusted cookie
 
+The ubank trusted cookie object may have to be manually updated from time to time.
+Obtain a new trusted cookie object using the `ubank` module:
+
+```console
+$ read -s PASSWORD
+SecretPassw0rd
+$ python -m ubank name@domain.com "$PASSWORD"
+Enter security code: 123456
+{'name': '026d9560-3c86-4680-b926-44bdd28eba94', 'value': 'YmxhaCBibGFoIGJsYWggYmxhaCBibGFoIGJsYWggYmxhaCBibGFo', 'domain': 'www.ubank.com.au', 'path': '/', 'expires': 1706758407, 'httpOnly': True, 'secure': True, 'sameSite': 'Strict'}
+```
+
+Replace the cookie object in [secrets.py](portfolio/secrets.py) with the new one.
+
+
+## Explanation
 
 ### Storing secrets
 
@@ -253,7 +269,6 @@ Setting memory size to 1024 MB resulted in much shorter durations: 100 ms or les
 ### GitHub Actions workflows
 
 This section describes the workflows used by this project.
-
 
 ```mermaid
 flowchart LR

@@ -42,10 +42,10 @@ jobs:
           ./bin/micromamba shell hook > ~/.bashrc
 
           # Install Poetry.
-          curl -sSL https://install.python-poetry.org | python3 - --version 1.7.1
+          pipx install poetry~=1.8
 
           # Create Mamba environment.
-          source ~/.bashrc
+          eval "$(./bin/micromamba shell hook -s posix)"
           micromamba create --file environment.yml --yes
           micromamba activate portfolio
 
@@ -55,7 +55,7 @@ jobs:
           # Install Firefox for Playwright.
           python -m playwright install --with-deps firefox
       - run: |
-          source ~/.bashrc
+          eval "$(./bin/micromamba shell hook -s posix)"
           micromamba activate portfolio
 
           # Unlock git-crypt.

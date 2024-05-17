@@ -44,6 +44,8 @@ class PortfolioStack(cdk.Stack):
             "PythonFunction",
             entry=str(Path(__file__).parent / "function"),
             runtime=lambda_.Runtime.PYTHON_3_12,
+            # Specify Poetry version in bundler container.
+            bundling=python.BundlingOptions(build_args={"POETRY_VERSION": "1.8"}),
             handler="handler",
             index="index.py",
             log_retention=logs.RetentionDays.ONE_MONTH,
@@ -57,6 +59,8 @@ class PortfolioStack(cdk.Stack):
             "DemoPythonFunction",
             entry=str(Path(__file__).parent / "demo-function"),
             runtime=lambda_.Runtime.PYTHON_3_12,
+            # Specify Poetry version in bundler container.
+            bundling=python.BundlingOptions(build_args={"POETRY_VERSION": "1.8"}),
             handler="handler",
             index="index.py",
             log_retention=logs.RetentionDays.ONE_MONTH,

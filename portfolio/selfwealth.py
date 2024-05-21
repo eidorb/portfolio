@@ -1,7 +1,10 @@
-import mechanicalsoup
-
+import re
 import typing
+import uuid
 
+import httpx
+from authlib.common.security import generate_token
+from authlib.integrations.httpx_client import OAuth2Client
 from beancount.core.data import Amount, Balance, D
 
 from .common import queensland_now
@@ -22,77 +25,127 @@ def get_balances(
 
     :return: List of Balance directives.
     """
-    browser = mechanicalsoup.StatefulBrowser()
-    browser.open("https://secure.selfwealth.com.au/Account/Login")
+    oauth2_client = OAuth2Client(
+        client_id="mobile",
+        # Client secrets seem to be arbitrary UUIDs 🤷.
+        client_secret=str(uuid.uuid4()).upper(),
+        scope="mobileAPI offline_access",
+        redirect_uri="au.com.selfwealth://callback",
+        code_challenge_method="S256",
+    )
+    # SelfWealth state, code and nonce tokens are 43 characters long.
+    state, code_verifier, nonce = (
+        generate_token(43),
+        generate_token(43),
+        generate_token(43),
+    )
+    authorization_url, _ = oauth2_client.create_authorization_url(
+        "https://auth.selfwealth.com.au/connect/authorize",
+        state=state,
+        code_verifier=code_verifier,
+        login_hint=email,
+        nonce=nonce,
+        prompt="login",
+    )
 
-    # First, authenticate with email and password credentials.
-    browser.post(
-        "https://secure.selfwealth.com.au/api/login",
-        json={
-            "Email": email,
-            "Password": password,
-            "RecaptchaResponseKey": None,
-        },
-        headers={
-            "X-XSRF-TOKEN": browser.page.find("input", attrs=dict(name="__aft"))[
-                "value"
-            ]
-        },
-    ).raise_for_status()
+    with httpx.Client() as http_client:
+        # Authorization URL redirects to SelfWealth login page.
+        response = http_client.get(authorization_url, follow_redirects=True)
 
-    # Then, authenticate with one-time pin.
-    browser.post(
-        "https://secure.selfwealth.com.au/api/loginTwoFactor",
-        json={"TwoFactorCode": otp},
-        headers={
-            "X-XSRF-TOKEN": browser.page.find("input", attrs=dict(name="__aft"))[
-                "value"
-            ],
-        },
-    ).raise_for_status()
+        # Parse XSRF token and return URL from login page.
+        xsrf_token = re.search(
+            r'<input name="__aft" type="hidden" value="(.+?)" />', response.text
+        ).group(1)
+        return_url = re.search(r"ReturnUrl: '(.+?)',", response.text).group(1)
 
-    # Open the dashboard to get portfolio ID.
-    browser.open("https://secure.selfwealth.com.au").raise_for_status()
-    portfolio_id = browser.page.find("body")["data-id"]
+        # Authenticate with username and password.
+        response = http_client.post(
+            "https://auth.selfwealth.com.au/api/login",
+            json={
+                "Email": email,
+                "Password": password,
+                "RecaptchaResponseKey": None,
+                "IsCancel": False,
+                "ReturnUrl": return_url,
+            },
+            # boot.min.js sets these headers.
+            headers={"X-Requested-With": "XMLHttpRequest", "X-XSRF-TOKEN": xsrf_token},
+        )
+        assert response.json()
 
+        # Authenticate with second factor.
+        response = http_client.post(
+            "https://auth.selfwealth.com.au/api/loginTwoFactor",
+            json={
+                "TwoFactorCode": otp,
+                "ReturnUrl": return_url,
+            },
+            # boot.min.js sets these headers.
+            headers={"X-Requested-With": "XMLHttpRequest", "X-XSRF-TOKEN": xsrf_token},
+        )
+        assert response.json()
+
+        # Request callback URL.
+        response = http_client.get(f"https://auth.selfwealth.com.au{return_url}")
+        # This should result in a redirect to the redirect URI.
+        assert response.next_request
+
+    # Finally, we can get the token! Setting the token here allows us to make
+    # authenticated requests using the OAuth2 client.
+    oauth2_client.token = oauth2_client.fetch_token(
+        url="https://auth.selfwealth.com.au/connect/token",
+        state=state,
+        # The code is contained in the query parameters of the redirect URI.
+        authorization_response=str(response.next_request.url),
+        code_verifier=code_verifier,
+    )
+
+    # Get portfolio ID (ignoring "virtual" portfolios).
+    # See https://apitest.selfwealth.com.au/swagger/index.html?urls.primaryName=SelfWealth%20Mobile%20API%20V4#operations-Mobile-get_api_v4_Mobile_portfolios
+    portfolio_id = next(
+        portfolio["portfolioId"]
+        for portfolio in oauth2_client.get(
+            "https://api.selfwealth.com.au/api/v4/Mobile/portfolios"
+        ).json()["data"]["portfolios"]
+        if portfolio["tradingStatusId"]
+    )
+
+    # /api/v3.3/Mobile/GetHoldings endpoint returns an object like the following.
+    # See https://apitest.selfwealth.com.au/swagger/index.html?urls.primaryName=SelfWealth%20Mobile%20API%20V3.3#operations-Mobile-get_api_v3_3_Mobile_GetHoldings
+    # [
+    #   ...,
+    #   {
+    #     "Id": 0,
+    #     "ProductId": 0,
+    #     "Code": "CASH",
+    #     "TRCode": null,
+    #     "ShortName": "Cash",
+    #     "AvailableUnits": 0,
+    #     "TotalUnits": 0,
+    #     "Price": 1,
+    #     "Value": 0,
+    #     "NetChange": 0,
+    #     "PercentageChange": 0,
+    #     "AveragePrice": null,
+    #     "Weight": 0,
+    #     "IsCash": true,
+    #     "ProfitLoss": null,
+    #     "ProfitLossPercentage": null,
+    #     "ProductMarketGroupId": 1,
+    #     "SectorId": 0,
+    #     "Sector": null,
+    #     "GICSId": 0,
+    #     "Trend": null,
+    #     "Name": null
+    #   },
+    #   ...
+    # ]
     now = queensland_now()
     balances = []
-
-    # The getholdingsfortrading endpoint returns an object like this:
-    #
-    #     {'Holdings': [
-    #       {'Id': 0,
-    #        'Code': 'CASH',
-    #        'TRCode': None,
-    #        'Name': 'Cash',
-    #        'ShortName': 'Cash',
-    #        'AvailableUnits': 100.00,
-    #        'TotalUnits': 100.00,
-    #        'Price': 1.0,
-    #        'Value': 100.00,
-    #        'NetChange': 0.0,
-    #        'PercentageChange': 0.0,
-    #        'AveragePrice': None,
-    #        'Trend': '',
-    #        'Messages': 0,
-    #        'RecogniaValue': 0.0,
-    #        'RecogniaType': -99,
-    #        'SectorId': 0,
-    #        'Sector': 'Sector Not Applicable',
-    #        'Weight': 0.0,
-    #        'IsCash': True,
-    #        'ProductWeight': 0.0,
-    #        'Yield': 0.0,
-    #        'PositionByCount': 0,
-    #        'PositionByWeight': 0,
-    #        'ProductMarketGroupId': 1,
-    #        'ULID': None},
-    #        ...
-    #       ],
-    #      'HoldingsCount': 10}
-    for holding in browser.get(
-        f"https://secure.selfwealth.com.au/api/portfolio/getholdingsfortrading?PortfolioId={portfolio_id}"
-    ).json()["Holdings"]:
+    for holding in oauth2_client.get(
+        "https://api.selfwealth.com.au/api/v3.3/Mobile/GetHoldings",
+        params={"PortfolioId": portfolio_id},
+    ).json():
         # Make it so each holding's code is either a currency code or stock symbol.
         code = holding["Code"]
         if code == "CASH":
@@ -112,5 +165,5 @@ def get_balances(
                 diff_amount=None,
             )
         )
-
+    oauth2_client.close()
     return balances

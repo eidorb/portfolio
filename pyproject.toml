@@ -9,7 +9,7 @@ pyotp = "^2.9.0"
 aws-cdk-lib = "^2.121.1"
 "aws-cdk.aws-lambda-python-alpha" = "^2.121.1a0"
 datasette = "^0.64.2"
-ubank = "^0.1.2"
+ubank = "^1.0.0"
 authlib = "^1.3.0"
 
 [tool.poetry.dev-dependencies]

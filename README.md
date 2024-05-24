@@ -366,13 +366,17 @@ The Lambda function retrieves the following parameters from Parameter Store on s
 | /portfolio/datasette-secret     | Key used to sign Datasette cookies.     |
 | /portfolio/github-client-id     | GitHub OAuth application client ID.     |
 | /portfolio/github-client-secret | GitHub OAuth application client secret. |
+| /portfolio/ubank-device         | Enrolled ubank device credentials.      |
+
+Parameters are stored in the `us-east-1` region.
 
 List parameters associated with this project with the following command:
 
 ```bash
 aws ssm describe-parameters --region us-east-1 --parameter-filters "Key=tag:project,Values=portfolio" --query 'Parameters[*].[Name,Type]' --output text --no-cli-pager
 
-/portfolio/datasette-secret	SecureString
-/portfolio/github-client-id	String
-/portfolio/github-client-secret	SecureString
+/portfolio/datasette-secret     SecureString
+/portfolio/github-client-id     String
+/portfolio/github-client-secret SecureString
+/portfolio/ubank-device SecureString
 ```

@@ -46,6 +46,10 @@ def update(filename="balances.beancount") -> None:
                 )
             ],
         ),
+        (
+            "ubank",
+            lambda: ubank.get_balances(device=ubank.get_device()),
+        ),
     ):
         # Open ledger file in append mode.
         with open(filename, mode="a") as file:
@@ -56,24 +60,3 @@ def update(filename="balances.beancount") -> None:
                 logger.info("Wrote %s balances to %s.", name, file.name)
             except Exception:
                 logger.error("Failed to get %s balances.", name, exc_info=True)
-
-    # Handle ubank a little differently to other institutions. The secret is updated
-    # if required.
-    try:
-        # Get cookie when getting balances.
-        balances, trusted_cookie = ubank.get_balances_and_cookie(
-            username=secrets.ubank.username,
-            password=secrets.ubank.password,
-            cookie=secrets.ubank.cookie,
-        )
-        logger.info("Retrieved ubank balances.")
-        with open(filename, mode="a") as file:
-            printer.print_entries(balances, file=file)
-        logger.info("Wrote ubank balances to %s.", file.name)
-    except Exception:
-        logger.error("Failed to update ubank balances.", exc_info=True)
-
-    # Update trusted cookie if changed.
-    if trusted_cookie != secrets.ubank.cookie:
-        ubank.change_cookie(trusted_cookie)
-        logger.info("Updated ubank trusted cookie")

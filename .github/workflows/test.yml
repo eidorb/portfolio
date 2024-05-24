@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Allows JWT to be requested from GitHub's OIDC provider.
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - id: cache
@@ -20,6 +24,7 @@ jobs:
             ./bin/micromamba
             ~/micromamba/envs
             ~/.local/pipx
+      # Assume role to read/write AWS parameter.
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2

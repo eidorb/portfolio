@@ -8,9 +8,9 @@ on:
 jobs:
   deploy-portfolio:
     runs-on: ubuntu-latest
-    # Allows JWT to be requested from GitHub's OIDC provider.
     permissions:
       contents: read
+      # Allows JWT to be requested from GitHub's OIDC provider.
       id-token: write
     steps:
       - uses: actions/checkout@v4

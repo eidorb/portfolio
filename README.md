@@ -36,7 +36,7 @@ The project is comprised of several pieces working together:
   - [How to rotate personal access tokens](#how-to-rotate-personal-access-tokens)
     - [portfolio/actions/write](#portfolioactionswrite)
     - [portfolio-ledger/contents/write](#portfolio-ledgercontentswrite)
-  - [How to update ubank trusted cookie](#how-to-update-ubank-trusted-cookie)
+  - [How to update ubank device credentials](#how-to-update-ubank-device-credentials)
 - [Explanation](#explanation)
   - [Storing secrets](#storing-secrets)
   - [Datasette authentication](#datasette-authentication)
@@ -180,20 +180,43 @@ Complete the following steps after an expiry notification is received.
 - Update portfolio's [TOKEN](https://github.com/eidorb/portfolio/settings/secrets/actions/TOKEN) repository secret.
 
 
-### How to update ubank trusted cookie
+### How to update ubank device credentials
 
-The ubank trusted cookie object may have to be manually updated from time to time.
-Obtain a new trusted cookie object using the `ubank` module:
-
+ubank device credentials are stored in AWS Parameter Store.
+Enrol a new device and update the parameter with the following commands:
 ```console
-$ read -s PASSWORD
-SecretPassw0rd
-$ python -m ubank name@domain.com "$PASSWORD"
-Enter security code: 123456
-{'name': '026d9560-3c86-4680-b926-44bdd28eba94', 'value': 'YmxhaCBibGFoIGJsYWggYmxhaCBibGFoIGJsYWggYmxhaCBibGFo', 'domain': 'www.ubank.com.au', 'path': '/', 'expires': 1706758407, 'httpOnly': True, 'secure': True, 'sameSite': 'Strict'}
+$  python -m ubank name@domain.com --output device.json
+Enter ubank password:
+Enter security code sent to 04xxxxx789: 123456
+$ aws ssm put-parameter \
+    --name "/portfolio/ubank-device" \
+    --value "$(< device.json)" \
+    --type SecureString \
+    --overwrite \
+    --region us-east-1 \
+    --no-cli-pager
+{
+    "Version": 19,
+    "Tier": "Standard"
+}
+$ rm device.json
 ```
 
-Replace the cookie object in [secrets.py](portfolio/secrets.py) with the new one.
+Check the parameter's value with the following command:
+```console
+$ aws ssm get-parameter \
+    --name "/portfolio/ubank-device" \
+    --with-decryption \
+    --region us-east-1 \
+    --output text \
+    --query 'Parameter.Value' \
+    --no-cli-pager
+{
+  "hardware_id": "d5c79ef7-8d6a-4feb-b129-a7f54440a348",
+  "device_id": "85ce55d4-4175-4016-bc37-1b563c680763",
+  ...
+}
+```
 
 
 ## Explanation

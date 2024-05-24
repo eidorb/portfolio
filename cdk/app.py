@@ -194,6 +194,15 @@ class PortfolioStack(cdk.Stack):
         distribution.grant_create_invalidation(github_oidc_role)
         demo_distribution.grant_create_invalidation(github_oidc_role)
 
+        # Grant GithubOidcRole permission to read and write ubank device parameter.
+        ubank_device_parameter = (
+            ssm.StringParameter.from_secure_string_parameter_attributes(
+                self, "UbankDeviceParameter", parameter_name="/portfolio/ubank-device"
+            )
+        )
+        ubank_device_parameter.grant_read(github_oidc_role)
+        ubank_device_parameter.grant_write(github_oidc_role)
+
         # Output CloudFront distribution IDs.
         cdk.CfnOutput(
             scope=self, id="DistributionId", value=distribution.distribution_id

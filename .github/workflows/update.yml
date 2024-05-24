@@ -6,13 +6,13 @@ on:
   schedule:
     - cron: "35 0 1,11,21 * *"
   workflow_dispatch:
-# Grant workflow permissions to write to this (portfolio) repository. This allows
-# updated secrets to be commited if necessary.
-permissions:
-  contents: write
 jobs:
   update-portfolio:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Allows JWT to be requested from GitHub's OIDC provider.
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -47,6 +47,7 @@ jobs:
 
           # Install Python package dependencies.
           poetry install
+      # Assume role to read/write AWS parameter.
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2
@@ -73,13 +74,6 @@ jobs:
           git add prices.beancount
           git status
           git commit -m "Update portfolio from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          git push
-
-          # Commit updated secrets to portfolio repository.
-          cd ..
-          git add portfolio/secrets.py
-          git status
-          git commit -m "Update secrets from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           git push
         env:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}

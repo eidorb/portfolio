@@ -5,6 +5,8 @@ on:
       - master
   # Allow workflow to be triggered from portfolio-ledger workflow.
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}
 jobs:
   deploy-portfolio:
     runs-on: ubuntu-latest

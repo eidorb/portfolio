@@ -1,4 +1,3 @@
-import logging
 import sys
 
 import pyotp
@@ -6,13 +5,9 @@ from beancount.parser import printer
 
 from . import bankwest, bitcoin, secrets, selfwealth, ubank, up
 
-logger = logging.getLogger(__name__)
-
 
 def update(filename="balances.beancount") -> None:
     """Updates ledger with latest account balances."""
-    logging.basicConfig(level=logging.INFO)
-
     # Iterate over (name, get_balances) tuples. For each tuple, retrieve balances
     # and append to ledger file.
     for name, get_balances in (
@@ -56,11 +51,11 @@ def update(filename="balances.beancount") -> None:
         with open(filename, mode="a") as file:
             try:
                 balances = get_balances()
-                logger.info("Retrieved %s balances.", name)
+                print(f"Retrieved {len(balances)} {name} balances.")
                 printer.print_entries(balances, file=file)
-                logger.info("Wrote %s balances to %s.", name, file.name)
+                print(f"Wrote {name} balances to {file.name}.")
             except Exception:
-                logger.error("Failed to get %s balances.", name, exc_info=True)
+                print("Failed to update {name} balances.")
 
 
 if __name__ == "__main__":

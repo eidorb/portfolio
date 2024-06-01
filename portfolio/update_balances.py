@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import pyotp
 from beancount.parser import printer
@@ -60,3 +61,7 @@ def update(filename="balances.beancount") -> None:
                 logger.info("Wrote %s balances to %s.", name, file.name)
             except Exception:
                 logger.error("Failed to get %s balances.", name, exc_info=True)
+
+
+if __name__ == "__main__":
+    update(sys.argv[1])

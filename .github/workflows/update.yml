@@ -63,8 +63,8 @@ jobs:
           sudo timedatectl set-timezone Australia/Queensland
 
           # Update balances and prices in ledger.
+          python -m portfolio.update_balances portfolio-ledger/balances.beancount
           cd portfolio-ledger
-          update-balances
           bean-price --inactive --date $(date -I) portfolio.beancount >> prices.beancount 2>/dev/null
 
           # Commit changes to portfolio-ledger repository.

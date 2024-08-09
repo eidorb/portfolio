@@ -55,7 +55,7 @@ def update(filename="balances.beancount") -> None:
                 printer.print_entries(balances, file=file)
                 print(f"Wrote {name} balances to {file.name}.")
             except Exception:
-                print("Failed to update {name} balances.")
+                print(f"Failed to update {name} balances.")
 
 
 if __name__ == "__main__":

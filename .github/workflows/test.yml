@@ -39,6 +39,7 @@ jobs:
           pipx install poetry~=1.8
 
           # Create Mamba environment.
+          export MAMBA_ROOT_PREFIX=~/micromamba
           eval "$(./bin/micromamba shell hook -s posix)"
           micromamba create --file environment.yml --yes
           micromamba activate portfolio
@@ -46,6 +47,7 @@ jobs:
           # Install Python package dependencies.
           poetry install
       - run: |
+          export MAMBA_ROOT_PREFIX=~/micromamba
           eval "$(./bin/micromamba shell hook -s posix)"
           micromamba activate portfolio
 

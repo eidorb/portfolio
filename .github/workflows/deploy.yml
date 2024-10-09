@@ -35,12 +35,12 @@ jobs:
         run: |
           # Install micromamba.
           wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
-          ./bin/micromamba shell hook > ~/.bashrc
 
           # Install Poetry.
           pipx install poetry~=1.8
 
           # Create Mamba environment.
+          export MAMBA_ROOT_PREFIX=~/micromamba
           eval "$(./bin/micromamba shell hook -s posix)"
           micromamba create --file environment.yml --yes
           micromamba activate portfolio
@@ -52,6 +52,7 @@ jobs:
           role-to-assume: arn:aws:iam::961672313229:role/Account-GithubOidcRole20798CD3-LZP3AHTIPJU2
           aws-region: ap-southeast-2
       - run: |
+          export MAMBA_ROOT_PREFIX=~/micromamba
           eval "$(./bin/micromamba shell hook -s posix)"
           micromamba activate portfolio
 

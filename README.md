@@ -17,7 +17,7 @@ The project is comprised of several pieces working together:
 - Balances and asset prices are stored in a plain text [Beancount](https://beancount.github.io) ledger.
 - [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/v2/guide/home.html) is used to define the cloud application in [code](cdk).
 - [Datasette](https://datasette.io) transforms data in the Beancount ledger into an interactive website.
-- [Mangum](https://mangum.io) allows the Datasette web application to run on AWS Lambda, resulting in a practically zero-cost deployment.
+- [Mangum](https://mangum.fastapiexpert.com) allows the Datasette web application to run on AWS Lambda, resulting in a practically zero-cost deployment.
 
 
 ## Contents

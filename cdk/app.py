@@ -127,8 +127,8 @@ class PortfolioStack(cdk.Stack):
                     )
                 ],
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-                # Use a placeholder domain name because origin will never be fetched.
-                origin=origins.HttpOrigin(domain_name="example.com"),
+                # Even example.com would be fine here, origin will never be fetched.
+                origin=origins.HttpOrigin(domain_name=domain_name),
             ),
             certificate=certificate,
             domain_names=[domain_name],
@@ -140,11 +140,10 @@ class PortfolioStack(cdk.Stack):
             self,
             "DemoDistribution",
             default_behavior=cloudfront.BehaviorOptions(
-                # Include all query strings in cache key, but maximal cache otherwise.
+                # Based cache policy includes query strings in cache key.
                 cache_policy=cloudfront.CachePolicy(
                     scope=self,
                     id="DemoCachePolicy",
-                    header_behavior=cloudfront.CacheHeaderBehavior.allow_list("Host"),
                     query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
                 ),
                 edge_lambdas=[
@@ -155,8 +154,8 @@ class PortfolioStack(cdk.Stack):
                     )
                 ],
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-                # Use a placeholder domain name because origin will never be fetched.
-                origin=origins.HttpOrigin(domain_name="example.com"),
+                # Even example.com would be fine here, origin will never be fetched.
+                origin=origins.HttpOrigin(domain_name=demo_domain_name),
             ),
             certificate=demo_certificate,
             domain_names=[demo_domain_name],

@@ -73,6 +73,9 @@ select
     normalised_balance.amount_currency
   ) as value_currency,
   case
+    -- Super balance in AUD is considered VDHG.
+    when account = 'Assets:Vanguard:Super' then 'VDHG'
+    -- AUD and USD are considered cash.
     when normalised_balance.amount_currency in ('AUD', 'USD') then 'Cash'
     else normalised_balance.amount_currency
   end as asset,

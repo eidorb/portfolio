@@ -1,7 +1,9 @@
+import io
 import sys
 
 import pyotp
 from beancount.parser import printer
+from ubank import Passkey
 
 from . import bankwest, secrets, selfwealth, ubank, up
 
@@ -34,7 +36,9 @@ def update(filename="balances.beancount") -> None:
         ),
         (
             "ubank",
-            lambda: ubank.get_balances(device=ubank.get_device()),
+            lambda: ubank.get_balances(
+                passkey=Passkey.load(io.BytesIO(secrets.ubank.passkey))
+            ),
         ),
     ):
         # Open ledger file in append mode.

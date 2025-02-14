@@ -36,7 +36,6 @@ The project is comprised of several pieces working together:
   - [How to rotate personal access tokens](#how-to-rotate-personal-access-tokens)
     - [portfolio/actions/write](#portfolioactionswrite)
     - [portfolio-ledger/contents/write](#portfolio-ledgercontentswrite)
-  - [How to update ubank device credentials](#how-to-update-ubank-device-credentials)
 - [Explanation](#explanation)
   - [Storing secrets](#storing-secrets)
   - [Datasette authentication](#datasette-authentication)
@@ -178,45 +177,6 @@ Complete the following steps after an expiry notification is received.
 
 - [Regenerate the token](https://github.com/settings/personal-access-tokens/3189407).
 - Update portfolio's [TOKEN](https://github.com/eidorb/portfolio/settings/secrets/actions/TOKEN) repository secret.
-
-
-### How to update ubank device credentials
-
-ubank device credentials are stored in AWS Parameter Store.
-Enrol a new device and update the parameter with the following commands:
-```console
-$  python -m ubank name@domain.com --output device.json
-Enter ubank password:
-Enter security code sent to 04xxxxx789: 123456
-$ aws ssm put-parameter \
-    --name "/portfolio/ubank-device" \
-    --value "$(< device.json)" \
-    --type SecureString \
-    --overwrite \
-    --region us-east-1 \
-    --no-cli-pager
-{
-    "Version": 19,
-    "Tier": "Standard"
-}
-$ rm device.json
-```
-
-Check the parameter's value with the following command:
-```console
-$ aws ssm get-parameter \
-    --name "/portfolio/ubank-device" \
-    --with-decryption \
-    --region us-east-1 \
-    --output text \
-    --query 'Parameter.Value' \
-    --no-cli-pager
-{
-  "hardware_id": "d5c79ef7-8d6a-4feb-b129-a7f54440a348",
-  "device_id": "85ce55d4-4175-4016-bc37-1b563c680763",
-  ...
-}
-```
 
 
 ## Explanation
@@ -389,7 +349,6 @@ The Lambda function retrieves the following parameters from Parameter Store on s
 | /portfolio/datasette-secret     | Key used to sign Datasette cookies.     |
 | /portfolio/github-client-id     | GitHub OAuth application client ID.     |
 | /portfolio/github-client-secret | GitHub OAuth application client secret. |
-| /portfolio/ubank-device         | Enrolled ubank device credentials.      |
 
 Parameters are stored in the `us-east-1` region.
 
@@ -401,5 +360,4 @@ aws ssm describe-parameters --region us-east-1 --parameter-filters "Key=tag:proj
 /portfolio/datasette-secret     SecureString
 /portfolio/github-client-id     String
 /portfolio/github-client-secret SecureString
-/portfolio/ubank-device SecureString
 ```

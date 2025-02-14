@@ -9,7 +9,7 @@ pyotp = "^2.9.0"
 aws-cdk-lib = "^2.121.1"
 "aws-cdk.aws-lambda-python-alpha" = "^2.121.1a0"
 datasette = "^0.64.2"
-ubank = "^1.0.0"
+ubank = "^2.2.4"
 authlib = "^1.3.0"
 boto3 = "^1.34.112"
 

@@ -141,11 +141,7 @@ class PortfolioStack(cdk.Stack):
             "DemoDistribution",
             default_behavior=cloudfront.BehaviorOptions(
                 # Based cache policy includes query strings in cache key.
-                cache_policy=cloudfront.CachePolicy(
-                    scope=self,
-                    id="DemoCachePolicy",
-                    query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
-                ),
+                cache_policy=cloudfront.CachePolicy(scope=self, id="DemoCachePolicy"),
                 edge_lambdas=[
                     cloudfront.EdgeLambda(
                         event_type=cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,

@@ -1,6 +1,6 @@
 # Portfolio
 
-[Serverless investment management portfolio](https://brodie.id.au/blog/serverless-investment-management-portfolio.html).
+See [*Serverless investment portfolio management*](https://brodie.id.au/blog/serverless-investment-management-portfolio.html) for an introduction to this project.
 
 
 ## Summary

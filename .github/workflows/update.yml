@@ -67,7 +67,9 @@ jobs:
           # Update balances and prices in ledger.
           python -m portfolio.update_balances portfolio-ledger/balances.beancount
           cd portfolio-ledger
-          bean-price --inactive --date $(date -I) portfolio.beancount >> prices.beancount 2>/dev/null
+          # latest bean-price fixes errors with packaged bean-price
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          uvx --from git+https://github.com/beancount/beanprice.git bean-price --inactive --date $(date -I) portfolio.beancount >> prices.beancount 2>/dev/null
 
           # Commit changes to portfolio-ledger repository.
           git config --global user.name "GitHub Actions"

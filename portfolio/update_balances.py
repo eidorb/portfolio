@@ -3,7 +3,7 @@ import sys
 import pyotp
 from beancount.parser import printer
 
-from . import bankwest, bitcoin, secrets, selfwealth, ubank, up
+from . import bankwest, secrets, selfwealth, ubank, up
 
 
 def update(filename="balances.beancount") -> None:
@@ -14,16 +14,6 @@ def update(filename="balances.beancount") -> None:
         (
             "Up",
             lambda: up.get_balances(token=secrets.up.api_token),
-        ),
-        (
-            "Bitcoin",
-            lambda: [
-                bitcoin.get_balance(
-                    api_key=secrets.blockonomics.api_key,
-                    addresses=secrets.bitcoin.addresses,
-                    account=secrets.bitcoin.account,
-                )
-            ],
         ),
         (
             "SelfWealth",

@@ -1,7 +1,6 @@
 import pytest
 
-from portfolio import secrets, bankwest
-
+from portfolio import bankwest, secrets
 from tests import SecretString
 
 
@@ -18,4 +17,4 @@ def password():
 def test_get_balance(pan, password):
     """Tests Balance directive is returned with expected accounts."""
     balance = bankwest.get_balance(pan, password)
-    assert balance.account.endswith("m")
+    assert balance.account.endswith("Mastercard")

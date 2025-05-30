@@ -62,11 +62,11 @@ def get_balances(
         response = http_client.post(
             "https://auth.selfwealth.com.au/api/login",
             json={
-                "Email": email,
-                "Password": password,
-                "RecaptchaResponseKey": None,
-                "IsCancel": False,
-                "ReturnUrl": return_url,
+                "email": email,
+                "password": password,
+                "recaptchaResponseKey": None,
+                "isCancel": False,
+                "returnUrl": return_url,
             },
             # boot.min.js sets these headers.
             headers={"X-Requested-With": "XMLHttpRequest", "X-XSRF-TOKEN": xsrf_token},

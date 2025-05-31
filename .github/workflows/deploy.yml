@@ -22,15 +22,15 @@ jobs:
           repository: eidorb/portfolio-ledger
           token: ${{ secrets.TOKEN }}
           path: portfolio-ledger
-      - id: cache
-        uses: actions/cache@v4
-        with:
-          # Use contents of Mamba environment file, NPM lock file and uv lock file as cache key.
-          key: ${{ hashFiles('environment.yml', 'package-lock.json', 'uv.lock') }}
-          # Cache micromamba binary, micromamba environment.
-          path: |
-            ~/.local/bin
-            ~/micromamba
+      # - id: cache
+      #   uses: actions/cache@v4
+      #   with:
+      #     # Use contents of Mamba environment file, NPM lock file and uv lock file as cache key.
+      #     key: ${{ hashFiles('environment.yml', 'package-lock.json', 'uv.lock') }}
+      #     # Cache micromamba binary, micromamba environment.
+      #     path: |
+      #       ~/.local/bin
+      #       ~/micromamba
       - if: steps.cache.outputs.cache-hit != 'true'
         run: |
           # Installs micromamba to ~/.local/bin, without init shell, without conda-forge

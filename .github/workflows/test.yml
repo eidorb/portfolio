@@ -17,6 +17,7 @@ jobs:
       - id: cache
         uses: actions/cache@v4
         with:
+          # TODO: migrate to uv
           # Use contents of Mamba environment file, NPM lock file and Poetry lock file as cache key.
           key: ${{ hashFiles('environment.yml', 'package-lock.json', 'poetry.lock') }}
           # Cache micromamba binary, environments, and pipx installs.

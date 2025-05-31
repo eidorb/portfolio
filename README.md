@@ -59,6 +59,10 @@ The project is comprised of several pieces working together:
 
 ### How to set up a local development environment
 
+Why micromamba _and_ uv? uv only handles Python dependencies.
+This project relies on non-Python tools like git-crypt and AWS CDK.
+Mamba excels at managing system packages in a platform-agnostic manner.
+
 Create the `portfolio` Mamba environment defined in `environment.yml`:
 
 ```bash
@@ -77,17 +81,11 @@ Install Node.js dependencies:
 npm ci
 ```
 
-Install Python dependencies:
-
-```bash
-poetry install
-```
-
 Install Lambda function Python dependencies:
 
 ```bash
 cd cdk/function
-poetry install
+poetry install # TODO: fix
 cd -
 ```
 
@@ -99,6 +97,7 @@ Activate the `portfolio` environment with the following command:
 ```bash
 micromamba activate portfolio
 ```
+
 
 ### How to update Node.js
 

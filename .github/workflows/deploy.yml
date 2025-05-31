@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - testing
   # Allow workflow to be triggered from portfolio-ledger workflow.
   workflow_dispatch:
 concurrency:

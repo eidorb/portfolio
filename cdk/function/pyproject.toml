@@ -1,22 +1,12 @@
 [project]
-name = ""
-version = "0.0.1"
-requires-python = ">=3.12,<3.13"
+name = "function"
+version = "0.1.0"
+requires-python = ">=3.12"
 dependencies = [
-    "mangum>=0.17.0,<0.18",
-    "datasette>=0.64.2,<0.65",
-    "datasette-auth-github>=0.13.1,<0.14",
-    "datasette-redirect-forbidden>=0.1,<0.2",
-    "datasette-dashboards>=0.6.2,<0.7",
-    "datasette-hashed-urls>=0.4,<0.5",
+    "mangum>=0.17.0",
+    "datasette>=0.64.2",
+    "datasette-auth-github>=0.13.1",
+    "datasette-redirect-forbidden>=0.1",
+    "datasette-dashboards>=0.6.2",
+    "datasette-hashed-urls>=0.4",
 ]
-
-[dependency-groups]
-dev = []
-
-[tool.uv]
-package = false
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"

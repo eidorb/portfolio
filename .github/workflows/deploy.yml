@@ -61,7 +61,7 @@ jobs:
           uv run sqlite3 cdk/function/portfolio.db < tables.sql
 
           # Precalculate table counts for immutable mode.
-          cd cdk/function; datasette inspect portfolio.db --inspect-file=inspect_data.json; cd -
+          cd cdk/function; uv run datasette inspect portfolio.db --inspect-file=inspect_data.json; cd -
 
           # Do the same for demo data.
           uv run bean-sql cdk/demo-function/demo-portfolio.beancount cdk/demo-function/portfolio.db 2>/dev/null

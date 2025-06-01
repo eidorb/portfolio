@@ -72,18 +72,18 @@ jobs:
           # Demo function dependencies are identical to the main function.
           cp cdk/function/pyproject.toml cdk/function/poetry.lock cdk/demo-function
 
-          export MAMBA_ROOT_PREFIX=~/micromamba
-          eval "$(./bin/micromamba shell hook -s posix)"
-          micromamba activate portfolio
+          # export MAMBA_ROOT_PREFIX=~/micromamba # fall through to default?
+          # eval "$(./bin/micromamba shell hook -s posix)" # probably not required if not using shell hook
+          # micromamba activate portfolio
 
           # Install Node.js package dependencies.
-          npm ci
+          micromamba run --name portfolio npm ci
 
           # Show CDK stack diff.
-          npx cdk diff
+          micromamba run --name portfolio npx cdk diff
 
           # Deploy CDK stack, writing CloudFormation outputs to file.
-          npx cdk deploy --require-approval never Portfolio --outputs-file outputs.json
+          micromamba run --name portfolio npx cdk deploy --require-approval never Portfolio --outputs-file outputs.json
 
           # Invalidate CloudFront caches.
           aws cloudfront create-invalidation \

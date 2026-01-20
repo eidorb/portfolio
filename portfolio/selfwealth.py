@@ -27,7 +27,8 @@ def get_balances(
     """
     oauth2_client = OAuth2Client(
         client_id="mobile",
-        # Client secrets seem to be arbitrary UUIDs 🤷.
+        # Client secrets seem to be arbitrary UUIDs 🤷. See authorization header
+        # in request to https://auth.selfwealth.com.au/connect/token
         client_secret=str(uuid.uuid4()).upper(),
         scope="mobileAPI offline_access",
         redirect_uri="au.com.selfwealth://callback",
@@ -58,6 +59,14 @@ def get_balances(
         ).group(1)
         return_url = re.search(r"ReturnUrl: '(.+?)',", response.text).group(1)
 
+        # This might check if a captcha needs to be completed. It is not strictly
+        # necessary, but we do it to run asserts in order to notice if things change.
+        response = http_client.get(
+            "https://auth.selfwealth.com.au/api/auth/GetCaptchaStatus",
+            params={"key": "Login"},
+        )
+        assert response.json() is False
+
         # Authenticate with username and password.
         response = http_client.post(
             "https://auth.selfwealth.com.au/api/login",
@@ -71,7 +80,7 @@ def get_balances(
             # boot.min.js sets these headers.
             headers={"X-Requested-With": "XMLHttpRequest", "X-XSRF-TOKEN": xsrf_token},
         )
-        assert response.json()
+        assert response.json()["Result"] == 6
 
         # Authenticate with second factor.
         response = http_client.post(
@@ -79,11 +88,12 @@ def get_balances(
             json={
                 "TwoFactorCode": otp,
                 "ReturnUrl": return_url,
+                "MfaType": 1,
             },
             # boot.min.js sets these headers.
             headers={"X-Requested-With": "XMLHttpRequest", "X-XSRF-TOKEN": xsrf_token},
         )
-        assert response.json()
+        assert response.json()["Result"] == 13
 
         # Request callback URL.
         response = http_client.get(f"https://auth.selfwealth.com.au{return_url}")

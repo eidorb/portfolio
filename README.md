@@ -307,16 +307,15 @@ This allows workflows to deploy to AWS without using long-lived credentials.
 
 ### Routing GitHub Actions traffic via a Tailscale exit node
 
-> [!NOTE]
-> This hack is no longer required after reverse engineering SelfWealth's mobile API.
-> I'll keep this information here, because it may be required again in the future.
-
-Some financial institution's websites behave differently when accessed from the
-GitHub Actions network, likely due to overly sensitive anti-bot protection.
+Some financial institution's websites behave differently when accessed from the GitHub Actions network, likely due to overly sensitive anti-bot protection.
 Code that would successfully retrieve a balance when run on a computer at home would fail when run on GitHub Actions.
 
 To work around this, the [deploy](.github/workflows/deploy.yml) and [test](.github/workflows/test.yml)
 workflows connect to a Tailscale network and route traffic via an exit node at home.
+
+Create a Tailscle OAuth client following this [guide](https://til.simonwillison.net/tailscale/tailscale-github-actions).
+(I needed only `auth_keys` scope, not `devices:core`.)
+Add the client secret to a GitHub Actions secret named `TAILSCALE_OAUTH_CLIENT_SECRET`.
 
 
 ## Reference

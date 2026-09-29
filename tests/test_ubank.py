@@ -1,13 +1,11 @@
 import io
 
-import pytest
 from ubank import Passkey
 
 from portfolio import secrets
 from portfolio.ubank import get_balances
 
 
-@pytest.mark.xfail(reason="ubank is broken until bot detection can be bypassed")
 def test_get_balances():
     """Tests Balance directive is returned with expected accounts."""
     passkey = Passkey.load(io.BytesIO(secrets.ubank.passkey))
